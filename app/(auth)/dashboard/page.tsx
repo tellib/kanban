@@ -10,7 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/Table';
-import { addBoard, getAllBoards } from '@/lib/db';
+import { useSession } from '@/hooks/useSession';
+import { addBoard, getAllBoards } from '@/lib/board';
 import { BoardData } from '@/models/data';
 import { IconCheck, IconPlus, IconX } from '@tabler/icons-react';
 import Link from 'next/link';
@@ -22,17 +23,22 @@ export default function Page() {
   const [addMode, setAddMode] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const session = useSession();
+
   const handleAdd = () => {
     if (!inputRef.current?.value) return;
     const board: BoardData = {
       title: inputRef.current.value,
-      owner_id: 1, // TODO once auth set up, this should be the current user
+      user_id: session?.user.id, // TODO once auth set up, this should be the current user
     };
     addBoard(board).then((data) => {
-      if (data) {
+      if (data?.[0]) {
+        console.log(data);
         inputRef.current?.blur();
         setAddMode(false);
-        boardList ? setBoardList([...boardList, data]) : setBoardList([data]);
+        boardList
+          ? setBoardList([...boardList, data[0]])
+          : setBoardList([data[0]]);
       }
     });
   };
@@ -69,7 +75,7 @@ export default function Page() {
     return <Center>Loading...</Center>;
   }
 
-  const data = boardList?.map(({ id, title, description }) => (
+  const data = boardList?.map(({ id, title }) => (
     <TableRow key={id}>
       <TableCell>{id}</TableCell>
       <TableCell>
@@ -77,7 +83,6 @@ export default function Page() {
           {title}
         </Link>
       </TableCell>
-      <TableCell>{description}</TableCell>
     </TableRow>
   ));
 
@@ -85,7 +90,7 @@ export default function Page() {
     <>
       {!addMode ? (
         <Button
-          variant={'simple'}
+          variant={'hover'}
           className='flex w-full items-center justify-start gap-1'
           onClick={() => setAddMode(true)}
         >
@@ -97,14 +102,14 @@ export default function Page() {
           <Input type='text' ref={inputRef} />
           <div className='flex gap-2'>
             <Button
-              variant={'simple'}
+              variant={'hover'}
               className='flex flex-1 justify-center bg-red-300'
               onClick={() => setAddMode(false)}
             >
               <IconX color='red' size={24} stroke={3} />
             </Button>
             <Button
-              variant={'simple'}
+              variant={'hover'}
               className='flex flex-1 justify-center bg-green-300 shadow-sm'
               onClick={() => handleAdd()}
             >
@@ -118,7 +123,6 @@ export default function Page() {
           <TableRow>
             <TableCell>ID</TableCell>
             <TableCell>Title</TableCell>
-            <TableCell>Description</TableCell>
           </TableRow>
         </TableHeader>
 

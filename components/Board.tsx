@@ -6,9 +6,17 @@ import { useEffect, useRef, useState } from 'react';
 import { BoardData, CardData, ListData } from '@/models/data';
 import { List } from './List';
 import { Button } from './Button';
-import { IconCheck, IconPlus, IconX } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconPlus,
+  IconSearch,
+  IconSettings,
+  IconUsers,
+  IconX,
+} from '@tabler/icons-react';
 import { Input } from './Input';
-import { addList } from '@/lib/db';
+import { addList } from '@/lib/list';
+import { cn } from '@/lib/utils';
 
 export interface BoardProps
   extends React.HTMLAttributes<HTMLDivElement>,
@@ -17,7 +25,7 @@ export interface BoardProps
 }
 
 export function Board({ board, variant }: BoardProps) {
-  const [items, setItems] = useState<ListData[]>(board.lists as ListData[]);
+  const [lists, setLists] = useState<ListData[]>(board.lists as ListData[]);
   const [addMode, setAddMode] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -27,13 +35,12 @@ export function Board({ board, variant }: BoardProps) {
     const list: ListData = {
       title: inputRef.current.value,
       board_id: board.id,
-      cards: [] as CardData[],
     };
-    addList(list).then((data: ListData) => {
+    addList(list).then((data) => {
       if (data) {
         inputRef.current?.blur();
         setAddMode(false);
-        items ? setItems([...items, data]) : setItems([data]);
+        lists ? setLists([...lists, data[0]]) : setLists([data[0]]);
       } else {
         // TODO handle error
       }
@@ -58,59 +65,82 @@ export function Board({ board, variant }: BoardProps) {
   }, [addMode]);
 
   return (
-    <>
-      <div className={boardVariants({ variant })}>
-        {items && items.length > 0 ? (
-          items.map((list) => <List key={'l' + list.id} list={list} />)
+    <div
+      className={cn(
+        boardVariants({ variant }),
+        'flex flex-col overflow-y-auto'
+      )}
+    >
+      <div className='flex items-center justify-between border-b border-white/30 bg-white/50 py-3 pl-8 pr-4 backdrop-blur dark:border-black/50 dark:bg-black/50'>
+        <h1 className='truncate text-xl font-bold dark:text-white'>
+          {board.title}
+        </h1>
+        <div className='flex min-w-fit items-center gap-x-1'>
+          <Button variant={'hover'}>
+            <IconSearch size={24} stroke={1.5} />
+            <p className='hidden md:inline'>Search</p>
+          </Button>
+          <Button variant={'hover'}>
+            <IconUsers size={24} stroke={1.5} />
+            <p className='hidden md:inline'>Share</p>
+          </Button>
+          <Button variant={'hover'}>
+            <IconSettings size={24} stroke={1.5} />
+            <p className='hidden md:inline'>Settings</p>
+          </Button>
+          <Button variant={'hover'} onClick={() => setAddMode(true)}>
+            <IconPlus size={24} stroke={1.5} />
+            <p className='hidden md:inline'>New List</p>
+          </Button>
+        </div>
+      </div>
+      <div className='flex flex-1 snap-x snap-mandatory gap-4 overflow-y-auto p-4 sm:snap-none'>
+        {lists && lists.length > 0 ? (
+          lists.map((list) => <List key={'l' + list.id} list={list} />)
         ) : (
           <></>
         )}
 
         {!addMode ? (
-          <Button
-            className='text-md flex h-fit min-w-72 items-center justify-start gap-1 bg-slate-500 py-3 hover:bg-slate-600'
-            onClick={() => setAddMode(true)}
-          >
-            <IconPlus size={18} />
-            Add list p
-          </Button>
+          <></>
         ) : (
-          <>
-            <div className='text-md flex min-w-72 flex-col items-center justify-start gap-2'>
-              <Input type='text' ref={inputRef} />
-              <div className='flex gap-2'>
-                <Button
-                  variant={'simple'}
-                  className='flex flex-1 justify-center bg-red-300'
-                  onClick={() => setAddMode(false)}
-                >
-                  <IconX color='red' size={24} stroke={3} />
-                </Button>
-                <Button
-                  variant={'simple'}
-                  className='flex flex-1 justify-center bg-green-300 shadow-sm'
-                  onClick={() => handleAdd()}
-                >
-                  <IconCheck color='green' size={24} stroke={3} />
-                </Button>
-              </div>
+          <div className='flex h-max max-h-full min-w-full snap-center snap-always flex-col gap-3 rounded-lg bg-white/70 p-4 shadow-xl ring-1 ring-inset ring-white/70 backdrop-blur sm:w-72 sm:min-w-72 dark:bg-black/70 dark:ring-black/70'>
+            <Input type='text' ref={inputRef} placeholder='List title' />
+            <div className='flex gap-2'>
+              <Button
+                variant={'hover'}
+                className='flex-1 justify-center'
+                onClick={() => setAddMode(false)}
+              >
+                <IconX size={24} stroke={3} />
+                <p>Cancel</p>
+              </Button>
+              <Button
+                variant={'hover'}
+                className='flex-1 justify-center'
+                onClick={() => handleAdd()}
+              >
+                <IconCheck size={24} stroke={3} />
+                <p>Add</p>
+              </Button>
             </div>
-          </>
+          </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
-// TODO add variants
-const boardVariants = cva('flex h-full gap-4 p-4 overflow-y-auto', {
+const boardVariants = cva('flex-1', {
   variants: {
     variant: {
-      white:
+      default: '',
+      silver:
         'from-slate-300 to-slate-200 dark:from-slate-700 dark:to-slate-600',
-      blue: 'from-slate-300 to-slate-200 dark:to-slate-400 dark:from-slate-600',
+      blue: 'from-blue-300 to-blue-200 dark:from-blue-900 dark:bg-blue-800',
       green:
-        'from-emerald-500 to-emerald-600 dark:from-emerald-900 dark:bg-emerald-700',
+        'from-emerald-400 to-emerald-600 dark:from-emerald-900 dark:bg-emerald-700',
+      red: 'from-red-500 to-red-300 dark:from-red-900 dark:bg-red-800',
       unstyled: 'bg-none',
     },
     direction: {
@@ -126,7 +156,7 @@ const boardVariants = cva('flex h-full gap-4 p-4 overflow-y-auto', {
     },
   },
   defaultVariants: {
-    variant: 'blue',
-    direction: 'b',
+    variant: 'green',
+    direction: 'bl',
   },
 });

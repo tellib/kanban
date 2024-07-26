@@ -1,12 +1,12 @@
-// import { AuthForm } from '@/components/AuthForm';
-// import { Center } from '@/components/Center';
+import { AuthForm } from '@/components/AuthForm';
+import { Center } from '@/components/Center';
 
 export default function Page() {
   return (
     <>
-      {/* <Center>
+      <Center>
         <AuthForm />
-      </Center> */}
+      </Center>
     </>
   );
 }

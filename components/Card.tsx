@@ -11,17 +11,17 @@ interface CardProps {
 }
 
 export function Card({ card }: CardProps) {
-  const [items, setItems] = useState<CardData>(card);
+  const [data, setData] = useState<CardData>(card);
   // const [editMode, setEditMode] = useState(false);
   // const inputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div
       className={cn(
-        'rounded-md border-2 border-transparent bg-slate-100 px-4 py-2 shadow-inner backdrop-blur-sm transition duration-150 ease-out hover:border-blue-500 hover:ease-in dark:bg-slate-700'
+        'rounded-md border-2 border-transparent bg-white px-4 py-2 shadow-inner transition duration-150 hover:border-blue-500 hover:ease-linear dark:bg-white/10'
       )}
     >
-      {items.title}
+      <p className='font-normal'>{data.description}</p>
     </div>
   );
 }

@@ -1,33 +1,42 @@
-export interface BoardData {
+export interface Board {
   id?: number;
+  user_id?: string;
   title: string;
-  description?: string;
-  owner_id?: number;
-  board_members?: number[];
-  lists?: ListData[];
+  inserted_at?: string;
+  position?: number;
+  lists?: List[];
 }
 
-export interface ListData {
+export interface List {
   id?: number;
+  user_id?: string;
   board_id: number;
   title: string;
-  order?: number;
-  cards?: CardData[];
+  inserted_at?: string;
+  position?: number;
+  cards?: Card[];
 }
 
-export interface CardData {
+export interface Card {
   id?: number;
-  title: string;
-  description?: string;
+  user_id?: string;
   list_id: number;
-  order?: number;
-  labels?: ListData[];
+  description: string;
+  completed_at?: string;
+  inserted_at?: string;
+  position?: number;
 }
 
-export interface UserData {
-  id: number;
-  username: string;
+export interface User {
+  id: string;
   email: string;
   created_at: string;
   updated_at: string;
 }
+
+export type {
+  Board as BoardData,
+  List as ListData,
+  Card as CardData,
+  User as UserData,
+};

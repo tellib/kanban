@@ -29,8 +29,7 @@ Input.displayName = 'Input';
 const inputVariants = cva('', {
   variants: {
     variant: {
-      default:
-        'placeholder:text-muted-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50 dark:border-neutral-400 dark:bg-neutral-500',
+      default: 'w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/20 ',
       unstyled: 'bg-none px-0 py-0',
     },
   },

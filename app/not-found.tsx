@@ -10,7 +10,9 @@ export default function NotFound() {
   return (
     <Center>
       <IconError404 size={128} />
-      <Button onClick={() => router.back()}>Go Back</Button>
+      <Button variant={'primary'} onClick={() => router.back()}>
+        Go Back
+      </Button>
     </Center>
   );
 }

@@ -24,13 +24,7 @@ export const ThemeSwitcher = () => {
   };
 
   return (
-    <Button
-      className={
-        'rounded-md px-3 py-2 font-medium transition duration-300 ease-out hover:bg-slate-200/80 hover:ease-in hover:dark:bg-slate-700/80'
-      }
-      variant={'unstyled'}
-      onClick={handleToggleTheme}
-    >
+    <Button variant={'hover'} onClick={handleToggleTheme}>
       {icon === 'moon' ? <IconMoon size={24} /> : <IconSun size={24} />}
     </Button>
   );

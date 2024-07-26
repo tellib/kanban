@@ -1,92 +1,69 @@
-import { BoardData, CardData, ListData } from '@/models/data';
-import axios from './axios';
+import { createClient } from '@supabase/supabase-js';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
-export { getStatus };
-export { addList, addCard, addBoard };
-export { getBoard, getAllBoards };
+if (!supabaseUrl) throw new Error('NEXT_PUBLIC_SUPABASE_URL not defined');
+if (!supabaseKey) throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY not defined');
 
-async function getStatus() {
+export const supabase = createClient(supabaseUrl, supabaseKey);
+
+async function getSession() {
   try {
-    const response = await axios.get('/');
-    if (response.data) {
-      return response.data;
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error('Error getting session: ', error.message);
+      return null;
     }
+    return data.session;
   } catch (error) {
-    console.log(error);
+    console.error('Unexpected error getting session: ', error);
     return null;
   }
 }
 
-async function addList(list: ListData) {
-  const { title, board_id } = list;
+async function signUp(email: string, password: string) {
   try {
-    const response = await axios.post('/list/', {
-      title: title,
-      board_id: board_id,
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
     });
-    if (response.data) {
-      return response.data;
+    if (error) {
+      console.error('Error signing up: ', error.message);
+      return null;
     }
+    return data.session;
   } catch (error) {
-    console.log(error);
+    console.error('Unexpected error signing up: ', error);
     return null;
   }
 }
 
-async function addCard(card: CardData) {
-  const { title, description, list_id } = card;
+async function signInWithPassword(email: string, password: string) {
   try {
-    const response = await axios.post('/card/', {
-      title: title,
-      description: description,
-      list_id: list_id,
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
     });
-    if (response.data) {
-      return response.data;
+    if (error) {
+      console.error('Error signing in: ', error.message);
+      return null;
     }
+    return data.session;
   } catch (error) {
-    console.log(error);
+    console.error('Unexpected error signing in: ', error);
     return null;
   }
 }
 
-async function addBoard(board: BoardData) {
-  const { title, description } = board;
+async function signOut() {
   try {
-    const response = await axios.post('/board/', {
-      title: title,
-      description: description,
-      owner_id: 1,
-    });
-    if (response.data) {
-      return response.data;
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out: ', error.message);
     }
   } catch (error) {
-    console.log(error);
-    return null;
+    console.error('Unexpected error signing out: ', error);
   }
 }
 
-async function getBoard(id: number) {
-  try {
-    const response = await axios.get(`/board/${id}/`);
-    if (response.data) {
-      return response.data;
-    }
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
-
-async function getAllBoards() {
-  try {
-    const response = await axios.get('/board/');
-    if (response.data) {
-      return response.data;
-    }
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
+export { getSession, signUp, signInWithPassword, signOut };

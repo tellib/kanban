@@ -4,7 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { cn } from '@/lib/utils';
 import { Navbar } from '@/components/Navbar';
-import { AuthProvider } from '@/components/AuthProvider';
+import { SessionProvider } from '@/components/SessionProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,16 +21,16 @@ export default function RootLayout({
     <html lang='en'>
       <body
         className={cn(
-          'flex h-screen w-screen flex-col bg-slate-300 text-slate-500 dark:bg-slate-600 dark:text-slate-400',
+          'flex h-screen w-screen flex-col bg-black/10 text-black/60 antialiased dark:bg-black/90 dark:text-white/70',
           inter.className
         )}
       >
-        <AuthProvider>
+        <SessionProvider>
           <ThemeProvider>
             <Navbar />
             {children}
           </ThemeProvider>
-        </AuthProvider>
+        </SessionProvider>
       </body>
     </html>
   );

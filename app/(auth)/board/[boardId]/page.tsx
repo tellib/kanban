@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react';
 import { BoardData } from '@/models/data';
 import { Board } from '@/components/Board';
 import { Center } from '@/components/Center';
-import { getBoard } from '@/lib/db';
+import { getBoard } from '@/lib/board';
 
 export default function Page({ params }: { params: { boardId: number } }) {
   const { boardId } = params;
+
   const [board, setBoard] = useState<BoardData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -15,7 +16,7 @@ export default function Page({ params }: { params: { boardId: number } }) {
     if (boardId) {
       getBoard(boardId).then((data) => {
         if (data) {
-          setBoard(data);
+          setBoard(data as BoardData);
           setLoading(false);
         }
       });
