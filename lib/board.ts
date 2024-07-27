@@ -5,7 +5,7 @@ async function getBoard(id: number) {
   const { data } = await supabase
     .from('boards')
     .select(
-      'id, title, lists ( id, title, position, cards ( id, description, position ))'
+      'id, title, preferences, lists ( id, title, position, cards ( id, description, position ))'
     )
     .eq('id', id)
     .order('position')
@@ -42,7 +42,7 @@ async function getBoard(id: number) {
   } */
 }
 
-async function getAllBoards() {
+async function getAllBoards(): Promise<BoardData[] | null> {
   const { data } = await supabase.from('boards').select('*').order('position');
   return data;
   /* Example response
@@ -66,8 +66,12 @@ async function getAllBoards() {
   } */
 }
 
-async function addBoard(board: BoardData) {
-  const { data } = await supabase.from('boards').insert(board).select();
+async function addBoard(board: BoardData): Promise<BoardData | null> {
+  const { data } = await supabase
+    .from('boards')
+    .insert(board)
+    .select()
+    .single();
   return data;
 
   /* Example response
@@ -83,8 +87,13 @@ async function addBoard(board: BoardData) {
   } */
 }
 
-async function deleteBoard(id: number) {
-  const { data } = await supabase.from('boards').delete().eq('id', id).select();
+async function deleteBoard(id: number): Promise<BoardData | null> {
+  const { data } = await supabase
+    .from('boards')
+    .delete()
+    .eq('id', id)
+    .select()
+    .single();
   return data;
   /* Example response
   {
@@ -105,8 +114,7 @@ async function updateBoard(board: BoardData): Promise<BoardData | null> {
     .update({ title: board.title })
     .match({ id: board.id })
     .select()
-    .maybeSingle();
-
+    .single();
   return data;
   /* Example response
   {
@@ -121,12 +129,11 @@ async function updateBoard(board: BoardData): Promise<BoardData | null> {
   } */
 }
 
-async function sortBoard(board: BoardData) {
+async function sortBoard(board: BoardData): Promise<BoardData | null> {
   const { data } = await supabase.rpc('sort_board', {
     board_id: board.id,
     list_ids: board.lists?.map((list) => list.id),
   });
-
   return data;
 }
 

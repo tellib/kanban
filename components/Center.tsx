@@ -1,15 +1,17 @@
 import { cn } from '@/lib/utils';
 
-export function Center({
-  children,
-  flex = 'flex-col',
-}: {
-  children: React.ReactNode;
-  flex?: string;
-}) {
+interface CenterProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const Center = ({ className, children, ...props }: CenterProps) => {
   return (
-    <div className={cn('flex h-full items-center justify-center', flex)}>
+    <div
+      className={cn(
+        'flex h-full flex-col items-center justify-center',
+        className
+      )}
+      {...props}
+    >
       {children}
     </div>
   );
-}
+};

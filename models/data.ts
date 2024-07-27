@@ -1,13 +1,18 @@
-export interface Board {
+interface Board {
   id?: number;
   user_id?: string;
   title: string;
   inserted_at?: string;
   position?: number;
   lists?: List[];
+  preferences?: BoardPref;
 }
 
-export interface List {
+interface BoardPref {
+  themeColor: string | 'default';
+}
+
+interface List {
   id?: number;
   user_id?: string;
   board_id: number;
@@ -17,7 +22,7 @@ export interface List {
   cards?: Card[];
 }
 
-export interface Card {
+interface Card {
   id?: number;
   user_id?: string;
   list_id: number;
@@ -27,11 +32,16 @@ export interface Card {
   position?: number;
 }
 
-export interface User {
+interface User {
   id: string;
   email: string;
   created_at: string;
   updated_at: string;
+  preferences?: UserPref;
+}
+
+interface UserPref {
+  darkMode: 'light' | 'dark' | 'system';
 }
 
 export type {

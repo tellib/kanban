@@ -1,27 +1,59 @@
+// CardDisplay
+
 'use client';
 
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { CardData } from '@/models/data';
-import axios from '@/lib/axios';
+import { IconX } from '@tabler/icons-react';
+import { deleteCard } from '@/lib/card';
 
 interface CardProps {
   card: CardData;
 }
 
 export function Card({ card }: CardProps) {
-  const [data, setData] = useState<CardData>(card);
-  // const [editMode, setEditMode] = useState(false);
+  const [data, setData] = useState<CardData | null>(card as CardData);
+  const [isHovered, setIsHovered] = useState(false);
   // const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleDeleteCard = () => {
+    if (!data || !data.id) return;
+    deleteCard(data.id).then((data) => {
+      if (data) {
+        console.log('Deleted card', data);
+        setData(null);
+      }
+    });
+  };
+
+  if (!data) return <></>;
 
   return (
     <div
       className={cn(
-        'rounded-md border-2 border-transparent bg-white px-4 py-2 shadow-inner transition duration-150 hover:border-blue-500 hover:ease-linear dark:bg-white/10'
+        'flex flex-row items-start gap-2 rounded-md border-2 border-transparent bg-white py-2 pl-4 pr-2 transition duration-150 hover:border-blue-500 hover:ease-linear dark:bg-white/10'
       )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <p className='font-normal'>{data.description}</p>
+      <p
+        onClick={() => console.log('clicked on card')}
+        className='flex-1 self-center font-medium'
+      >
+        {data.description}
+      </p>
+      <IconX
+        strokeWidth={2}
+        {...(isHovered
+          ? {
+              className:
+                'opacity-100 transition hover:bg-black/10 dark:hover:bg-white/10  rounded-md',
+            }
+          : { className: 'opacity-0' })}
+        onClick={() => handleDeleteCard()}
+      />
     </div>
   );
 }

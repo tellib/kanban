@@ -62,15 +62,8 @@ export function Navbar() {
         {links}
       </div>
       <div className='flex justify-center gap-4'>
-        <div className='flex flex-col items-end text-sm'>
-          {session ? (
-            <>
-              <p>{session.user.email}</p>
-              <p>{session?.user.last_sign_in_at}</p>
-            </>
-          ) : (
-            <></>
-          )}
+        <div className='flex flex-1 items-center text-sm'>
+          {session ? <p>{session.user.email}</p> : <></>}
         </div>
         <ThemeSwitcher />
       </div>

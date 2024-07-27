@@ -2,16 +2,21 @@
 
 import { Button } from '@/components/Button';
 import { Center } from '@/components/Center';
-import { IconError404 } from '@tabler/icons-react';
+import { IconArrowLeft, IconError404 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 
 export default function NotFound() {
   const router = useRouter();
   return (
-    <Center>
-      <IconError404 size={128} />
-      <Button variant={'primary'} onClick={() => router.back()}>
-        Go Back
+    <Center className='gap-2'>
+      <p className='text-2xl font-medium'>Page not found</p>
+      <Button
+        className='ring-1'
+        variant={'hover'}
+        onClick={() => router.back()}
+      >
+        <IconArrowLeft size={24} />
+        <p>Back</p>
       </Button>
     </Center>
   );

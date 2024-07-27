@@ -1,42 +1,65 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { IconCheck, IconDots, IconPlus, IconX } from '@tabler/icons-react';
+
+import { Input } from './Input';
 import { Button } from './Button';
 import { Card } from './Card';
 import { ListData, CardData } from '@/models/data';
-import { IconCheck, IconDots, IconPlus, IconX } from '@tabler/icons-react';
-import { Input } from './Input';
-import { addCard } from '@/lib/card';
+
 import { useSession } from '@/hooks/useSession';
+
+import { addCard } from '@/lib/card';
+import { deleteList, updateList } from '@/lib/list';
+import { Dropdown } from './Dropdown';
 
 interface ListProps {
   list: ListData;
 }
 
 export const List = ({ list }: ListProps) => {
-  const [cards, setCards] = useState<CardData[]>(list.cards as CardData[]);
+  const [data, setData] = useState<ListData | null>(list);
+  const [cards, setCards] = useState<CardData[]>(data?.cards as CardData[]);
   const [addMode, setAddMode] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
+  const inputRef = useRef<HTMLInputElement>(null);
   const session = useSession();
 
-  const handleAdd = () => {
-    if (!inputRef.current?.value || !list.id) return;
+  const handleAddCard = () => {
+    if (!inputRef.current?.value || !data?.id) return;
+
     const card: CardData = {
       description: inputRef.current.value,
       user_id: session?.user.id,
-      list_id: list.id,
+      list_id: data.id,
     };
     addCard(card).then((data) => {
       if (data) {
         inputRef.current?.blur();
         setAddMode(false);
-        cards ? setCards([...cards, data[0]]) : setCards([data[0]]);
-      } else {
-        // TODO handle error
-      }
+        cards ? setCards([...cards, data]) : setCards([data]);
+      } else console.log('Error adding card');
     });
   };
+
+  function handleUpdateList() {
+    if (!data) return;
+    updateList(data).then((data) => {
+      if (data) setData(data);
+      else console.log('Error updating list');
+    });
+  }
+
+  function handleDeleteList() {
+    if (!data || !data.id) return;
+    deleteList(data.id).then((data) => {
+      if (data) {
+        console.log('Deleted list', data);
+        setData(null);
+      }
+    });
+  }
 
   useEffect(() => {
     if (addMode) {
@@ -46,40 +69,35 @@ export const List = ({ list }: ListProps) => {
         }
         if (e.key === 'Enter') {
           if (inputRef.current?.value !== '') {
-            handleAdd();
+            handleAddCard();
           }
           setAddMode(false);
         }
       });
       inputRef.current?.focus();
     }
-  }, [addMode]);
+  });
+
+  if (!data) return <></>;
 
   return (
     <div className='flex h-max max-h-full min-w-full snap-center snap-always flex-col rounded-lg bg-white/70 shadow-xl ring-1 ring-inset ring-white/70 backdrop-blur sm:w-72 sm:min-w-72 dark:bg-black/70 dark:ring-black/70'>
       <div className='mx-2 flex items-center justify-between py-2 text-lg font-semibold dark:text-white'>
         <h1 className='truncate px-2'>{list.title}</h1>
         <div className='flex'>
-          <Button variant={'hover'}>
-            <IconX size={24} />
-          </Button>
-          <Button variant={'hover'}>
+          <Dropdown
+            title={'Actions'}
+            options={[
+              { name: 'Delete List', func: () => handleDeleteList() },
+              { name: 'Edit List name', func: () => {} },
+            ]}
+          >
             <IconDots size={24} />
-          </Button>
+          </Dropdown>
         </div>
       </div>
       <div className='flex flex-col gap-y-2 overflow-y-scroll px-2 py-0'>
-        {cards ? (
-          cards.map((item) => <Card key={'c' + item.id} card={item} />)
-        ) : (
-          <div className='py-0'>
-            <div className='border-2 border-transparent px-2 py-2'>
-              <p className='font-medium text-black/20 dark:text-white/20'>
-                No cards yet
-              </p>
-            </div>
-          </div>
-        )}
+        {cards?.map((card) => <Card key={card.id} card={card} />)}
       </div>
       <div className='p-2'>
         {!addMode ? (
@@ -106,7 +124,7 @@ export const List = ({ list }: ListProps) => {
               <Button
                 variant={'hover'}
                 className='flex-1 justify-center'
-                onClick={() => handleAdd()}
+                onClick={() => handleAddCard()}
               >
                 <IconCheck size={24} stroke={3} />
                 <p>Add</p>

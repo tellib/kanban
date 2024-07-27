@@ -1,3 +1,5 @@
+// BoardDisplay
+
 'use client';
 
 import { cva, VariantProps } from 'class-variance-authority';
@@ -11,12 +13,17 @@ import {
   IconPlus,
   IconSearch,
   IconSettings,
+  IconTrash,
   IconUsers,
   IconX,
 } from '@tabler/icons-react';
 import { Input } from './Input';
 import { addList } from '@/lib/list';
 import { cn } from '@/lib/utils';
+import { deleteBoard, updateBoard } from '@/lib/board';
+import { Center } from './Center';
+import router from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export interface BoardProps
   extends React.HTMLAttributes<HTMLDivElement>,
@@ -25,12 +32,14 @@ export interface BoardProps
 }
 
 export function Board({ board, variant }: BoardProps) {
+  const [data, setData] = useState<BoardData | null>(board);
   const [lists, setLists] = useState<ListData[]>(board.lists as ListData[]);
   const [addMode, setAddMode] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
-  const handleAdd = () => {
+  const handleAddList = () => {
     if (!inputRef.current?.value || !board.id) return;
     const list: ListData = {
       title: inputRef.current.value,
@@ -40,12 +49,27 @@ export function Board({ board, variant }: BoardProps) {
       if (data) {
         inputRef.current?.blur();
         setAddMode(false);
-        lists ? setLists([...lists, data[0]]) : setLists([data[0]]);
-      } else {
-        // TODO handle error
-      }
+        lists ? setLists([...lists, data]) : setLists([data]);
+      } else console.log('Error adding list');
     });
   };
+
+  function handleUpdateBoard() {
+    if (!data) return;
+    updateBoard(data).then((data) => {
+      if (data) setData(data);
+      else console.log('Error updating board');
+    });
+  }
+
+  function handleDeleteBoard() {
+    if (!data || !data.id) return;
+    deleteBoard(data.id).then((data) => {
+      if (data) {
+        router.push('/dashboard');
+      } else console.log('Error deleting board');
+    });
+  }
 
   useEffect(() => {
     if (addMode) {
@@ -55,14 +79,14 @@ export function Board({ board, variant }: BoardProps) {
         }
         if (e.key === 'Enter') {
           if (inputRef.current?.value !== '') {
-            handleAdd();
+            handleAddList();
           }
           setAddMode(false);
         }
       });
       inputRef.current?.focus();
     }
-  }, [addMode]);
+  });
 
   return (
     <div
@@ -84,6 +108,10 @@ export function Board({ board, variant }: BoardProps) {
             <IconUsers size={24} stroke={1.5} />
             <p className='hidden md:inline'>Share</p>
           </Button>
+          <Button variant={'hover'} onClick={() => handleDeleteBoard()}>
+            <IconTrash size={24} stroke={1.5} />
+            <p className='hidden md:inline'>Delete Board</p>
+          </Button>
           <Button variant={'hover'}>
             <IconSettings size={24} stroke={1.5} />
             <p className='hidden md:inline'>Settings</p>
@@ -94,8 +122,8 @@ export function Board({ board, variant }: BoardProps) {
           </Button>
         </div>
       </div>
-      <div className='flex flex-1 snap-x snap-mandatory gap-4 overflow-y-auto p-4 sm:snap-none'>
-        {lists && lists.length > 0 ? (
+      <div className='flex flex-1 snap-x snap-mandatory gap-4 overflow-y-auto p-4 sm:snap-none dark:[color-scheme:dark]'>
+        {lists.length > 0 ? (
           lists.map((list) => <List key={'l' + list.id} list={list} />)
         ) : (
           <></>
@@ -118,7 +146,7 @@ export function Board({ board, variant }: BoardProps) {
               <Button
                 variant={'hover'}
                 className='flex-1 justify-center'
-                onClick={() => handleAdd()}
+                onClick={() => handleAddList()}
               >
                 <IconCheck size={24} stroke={3} />
                 <p>Add</p>
@@ -156,7 +184,7 @@ const boardVariants = cva('flex-1', {
     },
   },
   defaultVariants: {
-    variant: 'green',
+    variant: 'blue',
     direction: 'bl',
   },
 });
