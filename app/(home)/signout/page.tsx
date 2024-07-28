@@ -18,7 +18,6 @@ export default function Page() {
     }
   }, [session, router]);
 
-  if (session) {
-    return <Center>Signing out...</Center>;
-  }
+  if (!session?.user) router.push('/login');
+  return <Center>Signing out...</Center>;
 }

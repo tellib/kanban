@@ -25,20 +25,20 @@ const components: { title: string; href: string }[] = [
 ];
 
 export function Navbar() {
-  const [open, setOpen] = useState(false);
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDialogElement>(null);
   const session = useSession();
 
   useEffect(() => {
-    open ? dialogRef.current?.showModal() : dialogRef.current?.close();
-  }, [open]);
+    isOpen ? menuRef.current?.showModal() : menuRef.current?.close();
+  }, [isOpen]);
 
   const links = components.map((component) => (
     <Link key={component.title} title={component.title} href={component.href}>
       <Button
         variant={'hover'}
         onClick={() => {
-          if (open) setOpen(false);
+          if (isOpen) setIsOpen(false);
         }}
       >
         {component.title}
@@ -53,7 +53,7 @@ export function Navbar() {
           <Button
             variant={'hover'}
             onClick={() => {
-              if (open) setOpen(false);
+              if (isOpen) setIsOpen(false);
             }}
           >
             <p className='font-bold'>Kanban</p>
@@ -69,12 +69,12 @@ export function Navbar() {
       </div>
 
       <div className='flex sm:hidden'>
-        <Button variant={'hover'} onClick={() => setOpen(true)}>
+        <Button variant={'hover'} onClick={() => setIsOpen(true)}>
           <IconMenu2 size={24} stroke={2} />
         </Button>
-        <Dialog ref={dialogRef} className='text-right'>
+        <Dialog ref={menuRef} className='text-right'>
           <div className='flex flex-col items-end gap-2 p-4 text-2xl'>
-            <Button variant={'hover'} onClick={() => setOpen(false)}>
+            <Button variant={'hover'} onClick={() => setIsOpen(false)}>
               <IconMenu2 size={24} stroke={2} />
             </Button>
             {links}

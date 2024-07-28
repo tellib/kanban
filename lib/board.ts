@@ -111,7 +111,7 @@ async function deleteBoard(id: number): Promise<BoardData | null> {
 async function updateBoard(board: BoardData): Promise<BoardData | null> {
   const { data } = await supabase
     .from('boards')
-    .update({ title: board.title })
+    .update({ title: board.title, preferences: board.preferences })
     .match({ id: board.id })
     .select()
     .single();

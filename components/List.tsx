@@ -15,48 +15,50 @@ import { deleteList, updateList } from '@/lib/list';
 import { Dropdown } from './Dropdown';
 
 interface ListProps {
-  list: ListData;
+  data: ListData;
 }
 
-export const List = ({ list }: ListProps) => {
-  const [data, setData] = useState<ListData | null>(list);
-  const [cards, setCards] = useState<CardData[]>(data?.cards as CardData[]);
+export const List = ({ data }: ListProps) => {
+  const [list, setList] = useState<ListData | null>(data);
   const [addMode, setAddMode] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const session = useSession();
 
   const handleAddCard = () => {
-    if (!inputRef.current?.value || !data?.id) return;
+    if (!inputRef.current?.value || !list?.id) return;
 
     const card: CardData = {
       description: inputRef.current.value,
       user_id: session?.user.id,
-      list_id: data.id,
+      list_id: list.id,
     };
-    addCard(card).then((data) => {
-      if (data) {
+    addCard(card).then((aCard) => {
+      if (aCard) {
         inputRef.current?.blur();
         setAddMode(false);
-        cards ? setCards([...cards, data]) : setCards([data]);
+        setList({
+          ...list,
+          cards: [...(list?.cards as CardData[]), aCard],
+        });
       } else console.log('Error adding card');
     });
   };
 
   function handleUpdateList() {
-    if (!data) return;
-    updateList(data).then((data) => {
-      if (data) setData(data);
+    if (!list) return;
+    updateList(list).then((uList) => {
+      if (uList) setList(uList);
       else console.log('Error updating list');
     });
   }
 
   function handleDeleteList() {
-    if (!data || !data.id) return;
-    deleteList(data.id).then((data) => {
-      if (data) {
-        console.log('Deleted list', data);
-        setData(null);
+    if (!list || !list.id) return;
+    deleteList(list.id).then((dList) => {
+      if (dList) {
+        console.log('Deleted list', dList);
+        setList(null);
       }
     });
   }
@@ -78,7 +80,7 @@ export const List = ({ list }: ListProps) => {
     }
   });
 
-  if (!data) return <></>;
+  if (!list) return <></>;
 
   return (
     <div className='flex h-max max-h-full min-w-full snap-center snap-always flex-col rounded-lg bg-white/70 shadow-xl ring-1 ring-inset ring-white/70 backdrop-blur sm:w-72 sm:min-w-72 dark:bg-black/70 dark:ring-black/70'>
@@ -97,7 +99,9 @@ export const List = ({ list }: ListProps) => {
         </div>
       </div>
       <div className='flex flex-col gap-y-2 overflow-y-scroll px-2 py-0'>
-        {cards?.map((card) => <Card key={card.id} card={card} />)}
+        {list?.cards &&
+          list.cards.length > 0 &&
+          list.cards.map((card) => <Card key={'c' + card.id} card={card} />)}
       </div>
       <div className='p-2'>
         {!addMode ? (

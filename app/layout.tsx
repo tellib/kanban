@@ -3,8 +3,8 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { cn } from '@/lib/utils';
-import { Navbar } from '@/components/Navbar';
 import { SessionProvider } from '@/components/SessionProvider';
+import { Navbar } from '@/components/Navbar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang='en'>
       <body
         className={cn(
-          'flex h-screen w-screen flex-col bg-black/10 text-black/60 antialiased dark:bg-black/90 dark:text-white/70',
+          'flex h-screen w-screen flex-col bg-gradient-to-bl from-neutral-300 to-neutral-200 text-black/60 antialiased dark:from-neutral-700 dark:to-neutral-600 dark:text-white/70',
           inter.className
         )}
       >

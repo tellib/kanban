@@ -4,12 +4,18 @@ import { Button } from './Button';
 export interface Option {
   name: string;
   func?: () => Promise<void> | void | Promise<Promise<void>>;
+  icon?: React.ReactNode;
 }
 
-export function Option({ name, func }: Option) {
+export function Option({ name, func, icon }: Option) {
   return (
-    <div className='block px-4 py-2 text-sm' role='menuitem' onClick={func}>
-      {name}
+    <div
+      className='flex flex-row items-center gap-1 px-4 py-3 text-sm transition ease-linear hover:cursor-pointer'
+      role='menuitem'
+      onClick={func}
+    >
+      {icon}
+      <p className='font-medium'>{name}</p>
     </div>
   );
 }
@@ -26,66 +32,36 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
     return (
       <div className='relative inline-block text-left'>
         <div>
-          {open ? (
-            <Button
-              variant={'hover'}
-              onClick={() => setOpen(!open)}
-              className='bg-white/50 ring-1 ring-black/10 dark:bg-black/50 dark:ring-white/10'
-            >
-              {children}
-            </Button>
-          ) : (
-            <Button variant={'hover'} onClick={() => setOpen(!open)}>
-              {children}
-            </Button>
-          )}
+          <Button
+            variant={'hover'}
+            onClick={() => {
+              setOpen(!open);
+            }}
+            // onMouseOver={() => setOpen(!open)}
+            // onFocus={() => setOpen(!open)}
+          >
+            {children}
+          </Button>
         </div>
         <div
-          className={`z-2 absolute right-0 mt-1.5 w-max origin-top-right divide-y divide-black/10 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition-opacity duration-150 ease-in-out focus:outline-none dark:divide-white/10 dark:bg-black/90 ${
+          className={`absolute right-0 z-50 mt-1.5 w-max origin-top-right divide-y divide-black/10 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 backdrop-blur-md transition-opacity duration-150 ease-in-out focus:outline-none dark:divide-white/10 dark:bg-black ${
             open ? 'opacity-100' : 'pointer-events-none opacity-0'
           }`}
           role='menu'
           aria-orientation='vertical'
           aria-labelledby='menu-button'
           tabIndex={-1}
+          onMouseLeave={() => setOpen(false)}
         >
           {options.map((option) => (
-            <div
-              key={option.name}
-              className='p-1.5 transition ease-linear hover:cursor-pointer hover:bg-black/5 dark:hover:bg-white/5'
-              role='none'
-            >
-              <Option name={option.name} func={option.func} />
+            <div key={option.name} role='none'>
+              <Option
+                name={option.name}
+                func={option.func}
+                icon={option.icon}
+              />
             </div>
           ))}
-          {/* <div className='py-1' role='none'>
-            <a
-              href='#'
-              className='block px-4 py-2 text-sm text-gray-700 hover:bg-black/5 hover:transition hover:duration-150 hover:ease-in'
-            >
-              Edit
-            </a>
-            <a
-              href='#'
-              className='block px-4 py-2 text-sm text-gray-700 hover:bg-black/5 hover:transition hover:duration-150 hover:ease-in'
-            >
-              Delete
-            </a>
-          </div> */}
-          {/* <div className='py-1' role='none'>
-            <a
-              href='#'
-              className='block px-4 py-2 text-sm text-gray-700 hover:bg-black/5 hover:transition hover:duration-150 hover:ease-in'
-            >
-              Archive
-            </a>
-            <a
-              href='#'
-              className='block px-4 py-2 text-sm text-gray-700 hover:bg-black/5 hover:transition hover:duration-150 hover:ease-in'
-            >
-              Move
-            </a>
-          </div> */}
         </div>
       </div>
     );

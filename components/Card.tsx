@@ -1,12 +1,10 @@
-// CardDisplay
-
 'use client';
 
+import { IconX } from '@tabler/icons-react';
 import { useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { CardData } from '@/models/data';
-import { IconX } from '@tabler/icons-react';
 import { deleteCard } from '@/lib/card';
 
 interface CardProps {
@@ -39,7 +37,7 @@ export function Card({ card }: CardProps) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <p
-        onClick={() => console.log('clicked on card')}
+        onClick={() => console.log('Clicked on card', data.id)}
         className='flex-1 self-center font-medium'
       >
         {data.description}

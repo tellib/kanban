@@ -5,11 +5,9 @@ interface Board {
   inserted_at?: string;
   position?: number;
   lists?: List[];
-  preferences?: BoardPref;
-}
-
-interface BoardPref {
-  themeColor: string | 'default';
+  preferences?: {
+    themeColor?: string;
+  };
 }
 
 interface List {
