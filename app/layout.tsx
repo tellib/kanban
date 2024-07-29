@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang='en'>
       <body
         className={cn(
-          'flex h-screen w-screen flex-col bg-gradient-to-bl from-blue-300 to-blue-200 text-black/60 antialiased dark:from-blue-700 dark:to-blue-600 dark:text-white/70',
+          'flex h-screen w-screen flex-col bg-gradient-to-bl from-blue-300 to-blue-200 text-black/60 antialiased dark:from-blue-900 dark:to-blue-700 dark:text-white/70',
           inter.className
         )}
       >

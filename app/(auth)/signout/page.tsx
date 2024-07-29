@@ -16,7 +16,7 @@ export default function Page() {
         signOut().then(() => router.push('/'));
       }, 1000);
     }
-  }, [session, router]);
+  });
 
   if (!session?.user) router.push('/login');
   return <Center>Signing out...</Center>;
