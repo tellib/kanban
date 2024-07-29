@@ -15,7 +15,7 @@ export default function NotFound() {
         variant={'hover'}
         onClick={() => router.back()}
       >
-        <IconArrowLeft size={24} />
+        <IconArrowLeft />
         <p>Back</p>
       </Button>
     </Center>

@@ -29,7 +29,8 @@ Input.displayName = 'Input';
 const inputVariants = cva('', {
   variants: {
     variant: {
-      default: 'w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/20 ',
+      default:
+        'w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/20  ring-1 ring-black/10 dark:ring-white/10 dark:ring-1 focus:ring-1 focus:ring-black/10 dark:focus:ring-white/10 focus:ring-offset-1 focus:ring-offset-black/10 dark:focus:ring-offset-white/10',
       unstyled: 'bg-none px-0 py-0',
     },
   },

@@ -21,15 +21,12 @@ export default function RootLayout({
     <html lang='en'>
       <body
         className={cn(
-          'flex h-screen w-screen flex-col bg-gradient-to-bl from-neutral-300 to-neutral-200 text-black/60 antialiased dark:from-neutral-700 dark:to-neutral-600 dark:text-white/70',
+          'flex h-screen w-screen flex-col bg-gradient-to-bl from-blue-300 to-blue-200 text-black/60 antialiased dark:from-blue-700 dark:to-blue-600 dark:text-white/70',
           inter.className
         )}
       >
         <SessionProvider>
-          <ThemeProvider>
-            <Navbar />
-            {children}
-          </ThemeProvider>
+          <ThemeProvider>{children}</ThemeProvider>
         </SessionProvider>
       </body>
     </html>

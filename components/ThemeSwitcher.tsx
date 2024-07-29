@@ -25,7 +25,7 @@ export const ThemeSwitcher = () => {
 
   return (
     <Button variant={'hover'} onClick={handleToggleTheme}>
-      {icon === 'moon' ? <IconMoon size={24} /> : <IconSun size={24} />}
+      {icon === 'moon' ? <IconMoon /> : <IconSun />}
     </Button>
   );
 };
