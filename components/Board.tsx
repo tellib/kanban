@@ -62,10 +62,11 @@ export function Board() {
     setMode('');
   }
 
-  function handleDeleteBoard() {
+  function handleDelete() {
     if (!board?.id) return;
     deleteBoard(board.id);
     router.push('/dashboard');
+    setMode('');
   }
   function handleColorChange(color: string) {
     if (!board?.id) return;
@@ -181,7 +182,7 @@ export function Board() {
           options={[
             {
               name: 'Delete Board',
-              func: () => handleDeleteBoard(),
+              func: () => setMode('delete'),
               icon: <IconTrash />,
             },
             {
@@ -278,7 +279,7 @@ export function Board() {
               <IconX />
               <p>Cancel</p>
             </Button>
-            <Button onClick={() => handleDeleteBoard()}>
+            <Button onClick={() => handleDelete()}>
               <IconTrash />
               <p>Delete</p>
             </Button>
@@ -326,6 +327,26 @@ export function Board() {
             >
               <IconCheck stroke={3} />
               <p>Save</p>
+            </Button>
+          </div>
+        </Modal>
+      )}
+
+      {mode === 'delete' && (
+        <Modal size='sm' title={'Delete Board'} ref={modalRef}>
+          <p>Are you sure you want to delete this board?</p>
+          <div className='flex gap-4'>
+            <Button
+              variant={'secondary'}
+              padding={'wide'}
+              onClick={() => setMode('')}
+            >
+              <IconX />
+              <p>Cancel</p>
+            </Button>
+            <Button onClick={() => handleDelete()}>
+              <IconTrash />
+              <p>Delete</p>
             </Button>
           </div>
         </Modal>

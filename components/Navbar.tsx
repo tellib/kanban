@@ -6,7 +6,12 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { Button } from './Button';
-import { IconMenu2 } from '@tabler/icons-react';
+import {
+  IconHome,
+  IconKeyboard,
+  IconLogout,
+  IconMenu2,
+} from '@tabler/icons-react';
 import { useSession } from '@/hooks/useSession';
 import { useRouter } from 'next/navigation';
 import { MobileMenu } from './MobileMenu';
@@ -28,9 +33,10 @@ export function Navbar() {
           <Button
             onClick={() => {
               router.push('/');
-              setOpen(!open);
+              setOpen(false);
             }}
           >
+            <IconHome />
             Home
           </Button>
         </Link>
@@ -41,20 +47,23 @@ export function Navbar() {
               <Button
                 onClick={() => {
                   router.push('/dashboard');
-                  setOpen(!open);
+                  setOpen(false);
                 }}
               >
+                <IconKeyboard />
                 Dashboard
               </Button>
             </Link>
 
             <Link key='Sign out' title='Sign out' href='/signout'>
               <Button
+                variant='secondary'
                 onClick={() => {
                   router.push('/signout');
-                  setOpen(!open);
+                  setOpen(false);
                 }}
               >
+                <IconLogout />
                 Sign out
               </Button>
             </Link>
@@ -66,7 +75,7 @@ export function Navbar() {
             <Button
               onClick={() => {
                 router.push('/login');
-                setOpen(!open);
+                setOpen(false);
               }}
             >
               Login

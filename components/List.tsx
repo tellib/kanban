@@ -50,6 +50,7 @@ export const List = ({ list }: { list: ListData }) => {
   const handleDelete = () => {
     if (!list.id) return;
     deleteList(list.id);
+    setMode('');
   };
 
   const handleEdit = () => {
@@ -74,9 +75,9 @@ export const List = ({ list }: { list: ListData }) => {
   const ListHeader = () => (
     <div className='flex items-center justify-between text-lg font-semibold dark:text-white'>
       <h1 className='truncate pl-2'>
-        <span className='font-mono text-black/20 dark:text-white/20'>
+        {/* <span className='font-mono text-black/20 dark:text-white/20'>
           {list.id}{' '}
-        </span>
+        </span> */}
         {list.title}
       </h1>
       <Dropdown
@@ -89,7 +90,7 @@ export const List = ({ list }: { list: ListData }) => {
           },
           {
             name: 'Delete List',
-            func: () => handleDelete(),
+            func: () => setMode('delete'),
             icon: <IconTrash />,
           },
         ]}
@@ -160,6 +161,27 @@ export const List = ({ list }: { list: ListData }) => {
             <Button className='w-full' onClick={() => handleEdit()}>
               <IconCheck stroke={3} />
               <p>Save</p>
+            </Button>
+          </div>
+        </Modal>
+      );
+
+    if (mode === 'delete')
+      return (
+        <Modal size='sm' title={'Delete List'} ref={modalRef}>
+          <p>Are you sure you want to delete this list?</p>
+          <div className='flex gap-4'>
+            <Button
+              variant={'secondary'}
+              padding={'wide'}
+              onClick={() => setMode('')}
+            >
+              <IconX />
+              <p>Cancel</p>
+            </Button>
+            <Button onClick={() => handleDelete()}>
+              <IconTrash />
+              <p>Delete</p>
             </Button>
           </div>
         </Modal>
