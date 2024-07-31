@@ -5,12 +5,12 @@ async function getBoard(id: number) {
   const { data } = await supabase
     .from('boards')
     .select(
-      'id, title, preferences, lists ( id, title, position, cards ( id, description, position ))'
+      'id, title, preferences, lists ( id, title, position, cards ( id, title, position ))'
     )
     .eq('id', id)
     .order('position')
-    .order('position', { foreignTable: 'lists' })
-    .order('position', { foreignTable: 'lists.cards' })
+    .order('position', { referencedTable: 'lists' })
+    .order('position', { referencedTable: 'lists.cards' })
     .single();
 
   return data;

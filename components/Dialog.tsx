@@ -13,7 +13,7 @@ export const Dialog = forwardRef<HTMLDialogElement, DialogProps>(
       <dialog
         ref={ref}
         className={cn(
-          'absolute inset-0 z-50 min-h-full min-w-full bg-white/20 backdrop-blur dark:bg-black/50',
+          'absolute inset-0 z-50 min-h-full min-w-full truncate bg-white/20 text-3xl font-medium backdrop-blur dark:bg-black/20 dark:text-white',
           className
         )}
         {...props}

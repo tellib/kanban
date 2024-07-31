@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toggleTheme } from '@/lib/utils';
-import { Button } from './Button';
+import { Button } from '../components/Button';
 import { IconMoon, IconSun } from '@tabler/icons-react';
 
 export const ThemeSwitcher = () => {

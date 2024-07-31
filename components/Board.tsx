@@ -1,5 +1,3 @@
-// BoardDisplay
-
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -16,37 +14,32 @@ import {
   IconPlus,
   IconRipple,
   IconSailboat,
-  IconSearch,
   IconTrain,
   IconTrash,
-  IconWaveSine,
+  IconTree,
+  IconWalk,
   IconX,
 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
-
 import { List } from './List';
 import { Input } from './Input';
-// import { Modal } from './Modal';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { Dropdown } from './Dropdown';
-
 import { BoardData, ListData } from '@/models/data';
 import { deleteBoard, updateBoard } from '@/lib/board';
-import { addList } from '@/lib/list';
-import { cn } from '@/lib/utils';
+import { addList, deleteList, updateList } from '@/lib/list';
+import { cn, colorString } from '@/lib/utils';
+import { Navcol } from './Navcol';
+import { Modal } from './Modal';
 
-export interface BoardProps {
-  data: BoardData;
-}
-
-export function Board({ data }: BoardProps) {
+export function Board({ data }: { data: BoardData }) {
   const [board, setBoard] = useState<BoardData>(data);
   const [mode, setMode] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  // const modalRef = useRef<HTMLDialogElement>(null);
+  const modalRef = useRef<HTMLDialogElement>(null);
   const router = useRouter();
 
-  const handleAddList = () => {
+  function handleAddList() {
     if (!inputRef.current?.value || !board?.id) return;
     const list: ListData = {
       title: inputRef.current.value,
@@ -62,7 +55,26 @@ export function Board({ data }: BoardProps) {
         });
       } else console.log('Error adding list');
     });
-  };
+  }
+
+  function handleDeleteList(id: number) {
+    deleteList(id).then((dList) => {
+      if (dList) {
+        setBoard({
+          ...board,
+          lists: board?.lists?.filter((list) => list.id !== id),
+        });
+        console.log('Deleted list', dList);
+      }
+    });
+  }
+
+  function handleUpdateList(uList: ListData) {
+    setBoard({
+      ...board,
+      lists: board?.lists?.map((list) => (list.id === uList.id ? uList : list)),
+    });
+  }
 
   function handleUpdateBoard(board: BoardData) {
     updateBoard(board).then((uBoard) => {
@@ -76,35 +88,48 @@ export function Board({ data }: BoardProps) {
 
   function handleDeleteBoard() {
     if (!board.id) return;
-    deleteBoard(board.id).then((deletedBoard) => {
-      if (deletedBoard) {
+    deleteBoard(board.id).then((dBoard) => {
+      if (dBoard) {
         router.push('/dashboard');
       } else console.log('Error deleting board');
     });
   }
-  const handleColorChange = (color: string) => {
-    const preferences = { ...board.preferences, themeColor: color };
+  function handleColorChange(color: string) {
+    const preferences = { ...board.preferences, color };
     setBoard((board) => {
       const updatedBoard = { ...board, preferences: preferences };
       handleUpdateBoard(updatedBoard);
       return updatedBoard;
     });
-  };
+  }
+
+  useEffect(() => {
+    if (mode === 'add') {
+      inputRef.current?.focus();
+    }
+    mode !== '' ? modalRef.current?.showModal() : modalRef.current?.close();
+  }, [mode]);
 
   const BoardHeader = () => (
     <div className='z-10 flex items-center justify-between border-b border-white/30 bg-white/50 py-3 pl-8 pr-4 backdrop-blur dark:border-black/50 dark:bg-black/50'>
       <div className='flex items-center gap-2'>
-        <Button variant={'hover'} onClick={() => router.push('/dashboard')}>
-          <IconHome size={24} stroke={1.5} />
-        </Button>
+        {/* TODO maybe include an emoji/icon option for board? */}
         <h1 className='truncate text-xl font-bold dark:text-white'>
           {board?.title}
         </h1>
       </div>
-      <div className='flex min-w-fit items-center gap-x-1'>
-        <Button variant={'hover'}>
-          <IconSearch size={24} stroke={1.5} />
-          <p className='hidden md:inline'>Search</p>
+      <div className='flex min-w-fit items-center gap-x-2'>
+        <Button variant={'hover'} onClick={() => router.push('/dashboard')}>
+          <IconHome />
+          <p className='hidden md:inline'>Dashboard</p>
+        </Button>
+        <Button variant={'hover'} onClick={() => setMode('delete')}>
+          <IconTrash />
+          <p className='hidden md:inline'>Delete</p>
+        </Button>
+        <Button variant={'hover'} onClick={() => setMode('info')}>
+          <IconInfoSquareRounded />
+          <p className='hidden md:inline'>Info</p>
         </Button>
         <Dropdown
           title={'Colors'}
@@ -120,14 +145,14 @@ export function Board({ data }: BoardProps) {
               icon: <IconSailboat />,
             },
             {
-              name: 'Yellow Sea',
+              name: 'Yellow Banana',
               func: () => handleColorChange('yellow'),
               icon: <IconRipple />,
             },
             {
-              name: 'Orange Fantasy',
+              name: 'Orange Peel',
               func: () => handleColorChange('orange'),
-              icon: <IconWaveSine />,
+              icon: <IconWalk />,
             },
             {
               name: 'Purple Pastel',
@@ -150,29 +175,20 @@ export function Board({ data }: BoardProps) {
               icon: <IconCloudRain />,
             },
             {
-              name: 'Remove Color',
-              func: () => handleColorChange(''),
+              name: 'Green Emerald',
+              func: () => handleColorChange('emerald'),
+              icon: <IconTree />,
             },
-            // { name: 'Green', func: () => handleColorChange('green') },
-            // { name: 'Fuschia', func: () => handleColorChange('fuschia') },
-            // { name: 'Emerald', func: () => handleColorChange('emerald') },
           ]}
         >
-          <IconPalette size={24} stroke={1.5} />
+          <IconPalette />
           <p className='hidden md:inline'>Colors</p>
         </Dropdown>
-        <Button variant={'hover'} onClick={() => setMode('delete')}>
-          <IconTrash size={24} stroke={1.5} />
-          <p className='hidden md:inline'>Delete</p>
-        </Button>
         <Button variant={'hover'} onClick={() => setMode('add')}>
-          <IconPlus size={24} stroke={1.5} />
-          <p className='hidden md:inline'>New</p>
+          <IconPlus />
+          <p className='hidden md:inline'>Add List</p>
         </Button>
-        <Button variant={'hover'} onClick={() => {}}>
-          <IconInfoSquareRounded size={24} stroke={1.5} />
-          <p className='hidden md:inline'>Info</p>
-        </Button>
+        <ThemeSwitcher />
       </div>
     </div>
   );
@@ -181,25 +197,32 @@ export function Board({ data }: BoardProps) {
     <div className='flex flex-1 snap-x snap-mandatory gap-4 overflow-y-auto p-4 sm:snap-none dark:[color-scheme:dark]'>
       {board?.lists &&
         board.lists.length > 0 &&
-        board.lists.map((list) => <List key={'l' + list.id} data={list} />)}
+        board.lists.map((list) => (
+          <List
+            key={'l' + list.id}
+            onDelete={handleDeleteList}
+            onUpdate={handleUpdateList}
+            data={list}
+          />
+        ))}
       {mode === 'add' && (
-        <div className='flex h-max max-h-full min-w-full snap-center snap-always flex-col gap-3 rounded-lg bg-white/70 p-4 shadow-xl ring-1 ring-inset ring-white/70 backdrop-blur sm:w-72 sm:min-w-72 dark:bg-black/70 dark:ring-black/70'>
-          <Input type='text' ref={inputRef} placeholder='List title' />
+        <div className='flex h-max max-h-full min-w-full snap-center snap-always flex-col gap-2 rounded-lg bg-white/70 p-2 shadow-xl ring-1 ring-inset ring-white/70 backdrop-blur sm:w-72 sm:min-w-72 dark:bg-black/70 dark:ring-black/70'>
+          <Input
+            type='text'
+            ref={inputRef}
+            placeholder='List title'
+            id='list'
+          />
           <div className='flex gap-2'>
-            <Button
-              variant={'hover'}
-              className='flex-1 justify-center'
-              onClick={() => setMode('')}
-            >
-              <IconX size={24} stroke={3} />
-              <p>Cancel</p>
+            <Button variant={'outlined'} onClick={() => setMode('')}>
+              <IconX stroke={3} />
             </Button>
             <Button
-              variant={'hover'}
-              className='flex-1 justify-center'
+              variant={'outlined'}
+              className='w-full'
               onClick={() => handleAddList()}
             >
-              <IconCheck size={24} stroke={3} />
+              <IconCheck stroke={3} />
               <p>Add</p>
             </Button>
           </div>
@@ -208,32 +231,51 @@ export function Board({ data }: BoardProps) {
     </div>
   );
 
-  const BoardFooter = () => (
-    <div className='flex items-center justify-start border-t bg-white/10 p-2'>
-      <ThemeSwitcher />
-    </div>
-  );
-
   return (
     <div
       className={cn(
-        'flex flex-1 flex-col overflow-y-auto',
-        board.preferences?.themeColor !== 'null'
-          ? `bg-gradient-to-bl from-${board.preferences?.themeColor}-300 to-${board.preferences?.themeColor}-200 dark:from-${board.preferences?.themeColor}-700 dark:to-${board.preferences?.themeColor}-600`
-          : ''
+        'flex flex-1 flex-col overflow-y-scroll bg-gradient-to-tl',
+        colorString(board?.preferences?.color)
       )}
     >
       <BoardHeader />
       <BoardContent />
-      <BoardFooter />
+
       {mode === 'delete' && (
-        // <Modal
-        //   open={true}
-        //   title='Are you sure you want to delete the board?'
-        //   func={() => handleDeleteBoard()}
-        //   ref={modalRef}
-        // />
-        <></>
+        <Modal title={'Delete Board'} ref={modalRef}>
+          <p>Are you sure you want to delete this board?</p>
+          <div className='flex gap-4'>
+            <Button
+              variant={'secondary'}
+              padding={'wide'}
+              onClick={() => setMode('')}
+            >
+              <IconX />
+              <p>Cancel</p>
+            </Button>
+            <Button onClick={() => handleDeleteBoard()}>
+              <IconTrash />
+              <p>Delete</p>
+            </Button>
+          </div>
+        </Modal>
+      )}
+
+      {mode === 'info' && (
+        <Modal title={'Board Info'} ref={modalRef}>
+          <p>
+            Board Name: <span className='font-mono'>{board?.title}</span>
+          </p>
+          <p>Board ID: {board?.id}</p>
+          <Button
+            variant={'secondary'}
+            padding={'wide'}
+            onClick={() => setMode('')}
+          >
+            <IconX />
+            <p>Close</p>
+          </Button>
+        </Modal>
       )}
     </div>
   );

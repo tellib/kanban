@@ -10,11 +10,7 @@ export default function NotFound() {
   return (
     <Center className='gap-2'>
       <p className='text-2xl font-medium'>Page not found</p>
-      <Button
-        className='w-96'
-        variant={'primary'}
-        onClick={() => router.back()}
-      >
+      <Button className='w-96' onClick={() => router.back()}>
         <IconArrowLeft />
         <p>Go back</p>
       </Button>

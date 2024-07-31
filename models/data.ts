@@ -6,7 +6,7 @@ interface Board {
   position?: number;
   lists?: List[];
   preferences?: {
-    themeColor?: string;
+    color?: string;
   };
 }
 
@@ -24,7 +24,9 @@ interface Card {
   id?: number;
   user_id?: string;
   list_id: number;
-  description: string;
+  title: string;
+  description?: string;
+  due_on?: string;
   completed_at?: string;
   inserted_at?: string;
   position?: number;

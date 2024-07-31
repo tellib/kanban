@@ -1,57 +1,81 @@
 'use client';
 
-import { IconX } from '@tabler/icons-react';
-import { useState } from 'react';
+import { IconPencil, IconX } from '@tabler/icons-react';
+import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { CardData } from '@/models/data';
-import { deleteCard } from '@/lib/card';
+import { CardWindow } from './CardWindow';
 
 interface CardProps {
-  card: CardData;
+  data: CardData;
+  onDelete: (id: number) => void;
+  onUpdate: (card: CardData) => void;
 }
 
-export function Card({ card }: CardProps) {
-  const [data, setData] = useState<CardData | null>(card as CardData);
+export function Card({ data, onDelete, onUpdate }: CardProps) {
+  const [card, setCard] = useState<CardData>(data);
   const [isHovered, setIsHovered] = useState(false);
-  // const inputRef = useRef<HTMLInputElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleDeleteCard = () => {
-    if (!data || !data.id) return;
-    deleteCard(data.id).then((data) => {
-      if (data) {
-        console.log('Deleted card', data);
-        setData(null);
-      }
-    });
+  const modalRef = useRef<HTMLDialogElement>(null);
+
+  const handleDeleteCard = (id: number) => {
+    onDelete(id);
   };
 
-  if (!data) return <></>;
+  const handleUpdateCard = (uCard: CardData) => {
+    setCard(uCard);
+    onUpdate(uCard);
+  };
 
-  return (
+  useEffect(() => {
+    isOpen
+      ? (modalRef.current?.showModal(),
+        modalRef.current?.addEventListener('close', () => {
+          setIsOpen(false);
+        }))
+      : modalRef.current?.close();
+  }, [isOpen]);
+
+  if (!card) return <></>;
+
+  const CardContent = () => (
     <div
       className={cn(
-        'flex flex-row items-start gap-2 rounded-md border-2 border-transparent bg-white py-2 pl-4 pr-2 transition duration-150 hover:border-blue-500 hover:ease-linear dark:bg-white/10'
+        'flex cursor-pointer flex-row items-start gap-2 rounded-md border-2 border-transparent bg-white py-2 pl-4 pr-2 shadow-inner transition duration-150 hover:border-blue-500 hover:ease-linear dark:bg-white/10'
       )}
+      onClick={() => setIsOpen(true)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <p
-        onClick={() => console.log('Clicked on card', data.id)}
-        className='flex-1 self-center font-medium'
-      >
-        {data.description}
-      </p>
-      <IconX
+      <p className='flex-1 self-center font-medium'>{card.title}</p>
+
+      <IconPencil
         strokeWidth={2}
-        {...(isHovered
-          ? {
-              className:
-                'opacity-100 transition hover:bg-black/10 dark:hover:bg-white/10  rounded-md',
-            }
-          : { className: 'opacity-0' })}
-        onClick={() => handleDeleteCard()}
+        className={cn(
+          'rounded-md transition ease-linear hover:shadow-sm hover:ring-1 dark:hover:bg-white/10',
+          isHovered ? 'opacity-100' : 'opacity-0'
+        )}
       />
+      <span className='font-mono text-black/20 dark:text-white/20'>
+        {card.id}
+      </span>
     </div>
+  );
+
+  return (
+    <>
+      <CardContent />
+      {isOpen && (
+        <CardWindow
+          data={card}
+          ref={modalRef}
+          onClose={() => setIsOpen(false)}
+          onDelete={handleDeleteCard}
+          onUpdate={handleUpdateCard}
+        />
+      )}
+    </>
   );
 }

@@ -9,29 +9,28 @@ export interface InputProps
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, type, className, variant, ...props }, ref) => {
+  ({ label, className, variant, ...props }, ref) => {
     return (
-      <>
-        {label && <label className='mb-1 mt-3 text-sm'>{label}</label>}
+      <div className='flex flex-col'>
+        {label && <label className='text-sm font-medium'>{label}</label>}
         <input
           ref={ref}
-          type={type}
           className={cn(inputVariants({ variant, className }))}
           {...props}
         />
-      </>
+      </div>
     );
   }
 );
 Input.displayName = 'Input';
 
 // TODO add variants
-const inputVariants = cva('', {
+const inputVariants = cva('w-full', {
   variants: {
     variant: {
       default:
-        'w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/20  ring-1 ring-black/10 dark:ring-white/10 dark:ring-1 focus:ring-1 focus:ring-black/10 dark:focus:ring-white/10 focus:ring-offset-1 focus:ring-offset-black/10 dark:focus:ring-offset-white/10',
-      unstyled: 'bg-none px-0 py-0',
+        'rounded-md px-3 py-2 text-sm bg-white dark:bg-white/20  ring-1 ring-black/10 dark:ring-white/10 dark:ring-1 focus:ring-1 focus:ring-black/10 dark:focus:ring-white/10 focus:ring-offset-1 focus:ring-offset-black/10 dark:focus:ring-offset-white/10 mt-1',
+      unstyled: 'bg-transparent',
     },
   },
   defaultVariants: {
