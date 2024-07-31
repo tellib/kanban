@@ -4,8 +4,8 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Modal } from '@/components/Modal';
 import { TextArea } from '@/components/TextArea';
-import { deleteCard, getCard, updateCard } from '@/lib/card';
-import { CardData } from '@/models/data';
+import { deleteCard, getCard, updateCard } from '@/lib/db';
+import { CardData } from '@/lib/data';
 import { IconTrash, IconX } from '@tabler/icons-react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 

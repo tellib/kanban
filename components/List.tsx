@@ -8,12 +8,12 @@ import { IconCheck, IconDots, IconPlus, IconX } from '@tabler/icons-react';
 import { Input } from './Input';
 import { Button } from './Button';
 import { Card } from './Card';
-import { ListData, CardData } from '@/models/data';
+import { ListData, CardData } from '@/lib/data';
 
 import { useSession } from '@/hooks/useSession';
 
-import { addCard, deleteCard } from '@/lib/card';
-import { deleteList, updateList } from '@/lib/list';
+import { addCard, deleteCard } from '@/lib/db';
+import { deleteList, updateList } from '@/lib/db';
 import { Dropdown } from './Dropdown';
 import { Container } from './Container';
 

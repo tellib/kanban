@@ -1,3 +1,10 @@
+export type {
+  Board as BoardData,
+  List as ListData,
+  Card as CardData,
+  User as UserData,
+};
+
 interface Board {
   id?: number;
   user_id?: string;
@@ -37,16 +44,4 @@ interface User {
   email: string;
   created_at: string;
   updated_at: string;
-  preferences?: UserPref;
 }
-
-interface UserPref {
-  darkMode: 'light' | 'dark' | 'system';
-}
-
-export type {
-  Board as BoardData,
-  List as ListData,
-  Card as CardData,
-  User as UserData,
-};

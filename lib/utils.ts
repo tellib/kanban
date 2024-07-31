@@ -1,6 +1,10 @@
 import { twMerge } from 'tailwind-merge';
 import { clsx, ClassValue } from 'clsx';
 
+/**
+ * Tailwind utility function
+ * merge tailwindcss classes without conflicts and allow for conditional classnames
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -15,7 +19,6 @@ export function initializeTheme() {
   } else {
     document.documentElement.classList.remove('dark');
   }
-  return true;
 }
 
 export function toggleTheme() {
@@ -28,6 +31,7 @@ export function toggleTheme() {
 }
 
 export function colorString(color: string | undefined) {
+  if (!color) return '';
   switch (color) {
     case 'pink':
       return 'from-pink-600 to-pink-400 dark:from-pink-700 dark:to-pink-600';

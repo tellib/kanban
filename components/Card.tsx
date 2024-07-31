@@ -4,7 +4,7 @@ import { IconPencil, IconX } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
-import { CardData } from '@/models/data';
+import { CardData } from '@/lib/data';
 import { CardWindow } from './CardWindow';
 
 interface CardProps {

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { IconLoader2 } from '@tabler/icons-react';
-import { BoardData } from '@/models/data';
+import { BoardData } from '@/lib/data';
 import { Board } from '@/components/Board';
 import { Center } from '@/components/Center';
-import { getBoard } from '@/lib/board';
+import { getBoard } from '@/lib/db';
 
 export default function Page({ params }: { params: { id: number } }) {
   const { id } = params;
