@@ -18,7 +18,7 @@ export default function Page() {
 
   return (
     <>
-      <Center>
+      <Center className='p-4'>
         <AuthForm />
       </Center>
     </>

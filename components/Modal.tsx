@@ -4,10 +4,12 @@ import { forwardRef, useEffect, useState } from 'react';
 import { Container } from './Container';
 import { Center } from './Center';
 
-interface ModalProps extends React.HTMLAttributes<HTMLDialogElement> {}
+interface ModalProps extends React.HTMLAttributes<HTMLDialogElement> {
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+}
 
 export const Modal = forwardRef<HTMLDialogElement, ModalProps>(
-  ({ children, className, ...props }, ref) => {
+  ({ children, className, size, ...props }, ref) => {
     return (
       <dialog className='relative z-10' {...props} ref={ref}>
         <div className='fixed inset-0 bg-black/70 transition-opacity dark:bg-black/60'>
@@ -16,7 +18,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(
               <Container
                 transparency={100}
                 padding={'xl'}
-                size={'lg'}
+                size={size || 'md'}
                 gap={'lg'}
                 className='z-20'
               >

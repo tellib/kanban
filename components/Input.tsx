@@ -6,14 +6,20 @@ export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement>,
     VariantProps<typeof inputVariants> {
   label?: string;
+  id: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, className, variant, ...props }, ref) => {
+  ({ label, className, variant, id, ...props }, ref) => {
     return (
       <div className='flex flex-col'>
-        {label && <label className='text-sm font-medium'>{label}</label>}
+        {label && (
+          <label htmlFor={id} className='text-sm font-medium'>
+            {label}
+          </label>
+        )}
         <input
+          id={id}
           ref={ref}
           className={cn(inputVariants({ variant, className }))}
           {...props}

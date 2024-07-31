@@ -29,12 +29,12 @@ async function getSession() {
   try {
     const { data, error } = await supabase.auth.getSession();
     if (error) {
-      console.error('Error getting session: ', error.message);
+      console.error('Error getting session', error.message);
       return null;
     }
     return data.session;
   } catch (error) {
-    console.error('Unexpected error getting session: ', error);
+    console.error('Unexpected error getting session', error);
     return null;
   }
 }
@@ -51,7 +51,7 @@ async function signUp(email: string, password: string) {
     }
     return data.session;
   } catch (error) {
-    console.error('Unexpected error signing up: ', error);
+    console.error('Unexpected error signing up', error);
     return null;
   }
 }
@@ -68,7 +68,7 @@ async function signInWithPassword(email: string, password: string) {
     }
     return data.session;
   } catch (error) {
-    console.error('Unexpected error signing in: ', error);
+    console.error('Unexpected error signing in', error);
     return null;
   }
 }
@@ -179,7 +179,7 @@ async function deleteList(id: number): Promise<ListData | null> {
 async function updateList(list: ListData): Promise<ListData | null> {
   const { data } = await supabase
     .from('lists')
-    .update(list)
+    .update({ title: list.title, position: list.position })
     .match({ id: list.id })
     .select()
     .single();

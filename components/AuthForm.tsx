@@ -65,7 +65,7 @@ export function AuthForm() {
 
   return (
     <Container size={'md'} padding={'lg'}>
-      <form className='flex flex-col gap-1' onSubmit={handleSubmit}>
+      <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
         <h1 className='mb-2 text-center text-xl font-bold dark:text-white'>
           {registering ? 'Register' : 'Login'}
         </h1>
@@ -76,6 +76,7 @@ export function AuthForm() {
           autoFocus
           required
           ref={emailRef}
+          autoComplete='email'
         />
         <Input
           type='password'

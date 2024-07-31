@@ -3,7 +3,15 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { IconCheck, IconDots, IconPlus, IconX } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconDots,
+  IconPencil,
+  IconPlus,
+  IconTrack,
+  IconTrash,
+  IconX,
+} from '@tabler/icons-react';
 
 import { Input } from './Input';
 import { Button } from './Button';
@@ -11,72 +19,81 @@ import { Card } from './Card';
 import { ListData, CardData } from '@/lib/data';
 
 import { useSession } from '@/hooks/useSession';
-
-import { addCard, deleteCard } from '@/lib/db';
-import { deleteList, updateList } from '@/lib/db';
 import { Dropdown } from './Dropdown';
 import { Container } from './Container';
+import { useBoard } from '@/hooks/useBoard';
+import { Modal } from './Modal';
 
-interface ListProps {
-  data: ListData;
-  onDelete: (id: number) => void;
-  onUpdate: (list: ListData) => void;
-}
-
-export const List = ({ data, onDelete, onUpdate }: ListProps) => {
-  const [list, setList] = useState<ListData>(data);
-  const [addMode, setAddMode] = useState(false);
+export const List = ({ list }: { list: ListData }) => {
+  const { addCard, deleteList, deleteCard, updateList, updateCard } =
+    useBoard();
+  const [mode, setMode] = useState('');
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDialogElement>(null);
   const session = useSession();
 
   const handleAddCard = () => {
-    if (!inputRef.current?.value || !list?.id) return;
+    if (!inputRef.current?.value || !list) return;
 
     const card: CardData = {
       title: inputRef.current.value,
       user_id: session?.user.id,
-      list_id: list.id,
+      list_id: list.id as number,
+      position: list.cards ? list.cards.length + 1 : 0,
     };
-    addCard(card).then((aCard) => {
-      if (aCard) {
-        inputRef.current?.blur();
-        setAddMode(false);
-        setList({
-          ...list,
-          cards: [...(list?.cards as CardData[]), aCard],
-        });
-      } else console.log('Error adding card');
-    });
+    addCard(card);
+    setMode('');
+    inputRef.current.value = '';
   };
 
-  const handleDeleteCard = (id: number) => {
-    setList({ ...list, cards: list?.cards?.filter((card) => card.id !== id) });
+  const handleDeleteList = () => {
+    if (!list.id) return;
+    deleteList(list.id);
   };
 
-  const handleUpdateCard = (uCard: CardData) => {
-    setList({
+  const handleUpdateList = () => {
+    if (!inputRef.current?.value || !list) return;
+
+    const updatedList: ListData = {
       ...list,
-      cards: list?.cards?.map((card) => (card.id === uCard.id ? uCard : card)),
-    });
+      title: inputRef.current.value,
+    };
+    updateList(updatedList);
+    setMode('');
+    inputRef.current.value = '';
   };
 
   useEffect(() => {
-    if (addMode) {
+    if (mode === 'add') {
       inputRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
-          setAddMode(false);
+          setMode('');
         }
         if (e.key === 'Enter') {
           if (inputRef.current?.value !== '') {
             handleAddCard();
           }
-          setAddMode(false);
+          setMode('');
         }
       });
       inputRef.current?.focus();
     }
-  });
+
+    if (mode !== '') {
+      modalRef.current?.showModal();
+      modalRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setMode('');
+        }
+        if (mode === 'edit' && e.key === 'Enter') {
+          if (inputRef.current?.value !== '') {
+            handleUpdateList();
+          }
+        }
+      });
+    }
+  }, [mode]);
 
   if (!list) return <></>;
 
@@ -91,8 +108,16 @@ export const List = ({ data, onDelete, onUpdate }: ListProps) => {
       <Dropdown
         title={'Actions'}
         options={[
-          // { name: 'Delete list', func: () => handleDeleteList() },
-          { name: 'Edit list name', func: () => {} },
+          {
+            name: 'Edit List Name',
+            func: () => setMode('edit'),
+            icon: <IconPencil />,
+          },
+          {
+            name: 'Delete List',
+            func: () => handleDeleteList(),
+            icon: <IconTrash />,
+          },
         ]}
       >
         <IconDots />
@@ -104,28 +129,21 @@ export const List = ({ data, onDelete, onUpdate }: ListProps) => {
     <div className='flex flex-col gap-y-2 overflow-y-scroll'>
       {list.cards &&
         // list.cards.length > 0 &&
-        list.cards.map((card) => (
-          <Card
-            key={'c' + card.id}
-            data={card}
-            onDelete={handleDeleteCard}
-            onUpdate={handleUpdateCard}
-          />
-        ))}
+        list.cards.map((card) => <Card key={'c' + card.id} card={card} />)}
     </div>
   );
 
   const ListButtons = () => {
-    if (!addMode) {
+    if (mode === '') {
       return (
-        <Button variant={'hover'} onClick={() => setAddMode(true)}>
+        <Button variant={'hover'} onClick={() => setMode('add')}>
           <IconPlus size={18} />
           Add card
         </Button>
       );
     }
 
-    if (addMode) {
+    if (mode === 'add') {
       return (
         <div className='flex w-full flex-col gap-2'>
           <Input
@@ -135,7 +153,7 @@ export const List = ({ data, onDelete, onUpdate }: ListProps) => {
             id='card'
           />
           <div className='flex gap-2'>
-            <Button variant={'outlined'} onClick={() => setAddMode(false)}>
+            <Button variant={'outlined'} onClick={() => setMode('')}>
               <IconX stroke={3} />
             </Button>
             <Button
@@ -152,11 +170,39 @@ export const List = ({ data, onDelete, onUpdate }: ListProps) => {
     }
   };
 
+  const ListModal = () => {
+    if (mode === 'edit')
+      return (
+        <Modal size='sm' title={'Edit List'} ref={modalRef}>
+          <Input
+            type='text'
+            ref={inputRef}
+            placeholder='List title'
+            id='list'
+          />
+          <div className='flex gap-2'>
+            <Button variant={'outlined'} onClick={() => setMode('')}>
+              <IconX stroke={3} />
+            </Button>
+            <Button
+              variant={'outlined'}
+              className='w-full'
+              onClick={() => handleUpdateList()}
+            >
+              <IconCheck stroke={3} />
+              <p>Save</p>
+            </Button>
+          </div>
+        </Modal>
+      );
+  };
+
   return (
     <Container size={'sm'} snap={true}>
       <ListHeader />
       <ListContent />
       <ListButtons />
+      <ListModal />
     </Container>
   );
 };

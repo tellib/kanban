@@ -1,4 +1,5 @@
 import { Navbar } from '@/components/Navbar';
+import { SessionProvider } from '@/components/SessionProvider';
 
 export default function HomeLayout({
   children,
@@ -7,8 +8,10 @@ export default function HomeLayout({
 }) {
   return (
     <>
-      <Navbar />
-      {children}
+      <SessionProvider>
+        <Navbar />
+        {children}
+      </SessionProvider>
     </>
   );
 }
