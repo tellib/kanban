@@ -11,56 +11,44 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Container } from './Container';
+import { Modal } from './Modal';
 
 export function Dashboard() {
   const [boardList, setBoardList] = useState<BoardData[] | null>(null);
-  const [mode, setMode] = useState<string | null>(null);
+  const [mode, setMode] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDialogElement>(null);
 
   const session = useSession();
-  const router = useRouter();
 
-  const handleAddBoard = () => {
+  const handleAdd = () => {
     if (!inputRef.current?.value) return;
     const board: BoardData = {
       title: inputRef.current.value,
       user_id: session?.user.id,
     };
-    addBoard(board).then((data) => {
-      if (data) {
-        console.log(data);
+    addBoard(board).then((aBoard) => {
+      if (aBoard) {
+        console.log(aBoard);
         inputRef.current?.blur();
-        setMode(null);
-        boardList ? setBoardList([...boardList, data]) : setBoardList([data]);
+        setMode('');
+        boardList
+          ? setBoardList([...boardList, aBoard])
+          : setBoardList([aBoard]);
       }
+      setMode('');
     });
   };
 
   useEffect(() => {
-    if (!mode) {
-      getAllBoards().then((data) => {
-        if (data) setBoardList(data);
-      });
-    }
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setMode(null);
-      }
-      if (e.key === 'Enter' && inputRef.current?.value !== '') {
-        handleAddBoard();
-        setMode('false');
-      }
-    };
+    getAllBoards().then((data) => {
+      if (data) setBoardList(data);
+    });
+  }, []);
 
-    if (mode) {
-      inputRef.current?.addEventListener('keydown', handleKeyDown);
-      inputRef.current?.focus();
-    }
-
-    return () => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      inputRef.current?.removeEventListener('keydown', handleKeyDown);
-    };
+  useEffect(() => {
+    if (mode === 'add') inputRef.current?.focus();
+    if (mode !== '') modalRef.current?.showModal();
   }, [mode]);
 
   if (boardList?.length === 0 && !mode && session) {
@@ -105,7 +93,7 @@ export function Dashboard() {
     );
 
   const DashboardFooter = () => {
-    if (!mode)
+    if (mode === '')
       return (
         <Button
           className='flex w-full items-center justify-start gap-1'
@@ -117,24 +105,42 @@ export function Dashboard() {
       );
     if (mode === 'add')
       return (
-        <div className='flex w-full flex-row gap-2'>
+        <Modal title={'Add Board'} ref={modalRef}>
           <Input
             type='text'
             ref={inputRef}
             placeholder='Board title'
             id='board'
           />
-          <Button onClick={() => setMode(null)}>
-            <IconX stroke={3} />
-          </Button>
-          <Button onClick={handleAddBoard}>
-            <IconCheck stroke={3} />
-            <p>Add</p>
-          </Button>
-        </div>
+          <div className='flex gap-2'>
+            <Button onClick={() => setMode('')}>
+              <IconX stroke={3} />
+            </Button>
+            <Button onClick={handleAdd}>
+              <IconCheck stroke={3} />
+              <p>Add</p>
+            </Button>
+          </div>
+        </Modal>
       );
   };
 
+  if (mode !== '') {
+    modalRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMode('');
+      if (inputRef.current?.value !== '' && e.key === 'Enter') {
+        mode == 'add' && handleAdd();
+        // mode == 'edit' && handleEdit();
+      }
+    });
+    inputRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMode('');
+      if (inputRef.current?.value !== '' && e.key === 'Enter') {
+        mode == 'add' && handleAdd();
+        // mode == 'edit' && handleEdit();
+      }
+    });
+  }
   return (
     <Container size={'lg'} padding={'lg'} gap={'lg'}>
       <DashboardHeader />

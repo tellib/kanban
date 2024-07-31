@@ -33,7 +33,7 @@ export const List = ({ list }: { list: ListData }) => {
   const modalRef = useRef<HTMLDialogElement>(null);
   const session = useSession();
 
-  const handleAddCard = () => {
+  const handleAdd = () => {
     if (!inputRef.current?.value || !list) return;
 
     const card: CardData = {
@@ -47,12 +47,12 @@ export const List = ({ list }: { list: ListData }) => {
     inputRef.current.value = '';
   };
 
-  const handleDeleteList = () => {
+  const handleDelete = () => {
     if (!list.id) return;
     deleteList(list.id);
   };
 
-  const handleUpdateList = () => {
+  const handleEdit = () => {
     if (!inputRef.current?.value || !list) return;
 
     const updatedList: ListData = {
@@ -65,34 +65,8 @@ export const List = ({ list }: { list: ListData }) => {
   };
 
   useEffect(() => {
-    if (mode === 'add') {
-      inputRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          setMode('');
-        }
-        if (e.key === 'Enter') {
-          if (inputRef.current?.value !== '') {
-            handleAddCard();
-          }
-          setMode('');
-        }
-      });
-      inputRef.current?.focus();
-    }
-
-    if (mode !== '') {
-      modalRef.current?.showModal();
-      modalRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          setMode('');
-        }
-        if (mode === 'edit' && e.key === 'Enter') {
-          if (inputRef.current?.value !== '') {
-            handleUpdateList();
-          }
-        }
-      });
-    }
+    if (mode === 'add') inputRef.current?.focus();
+    if (mode !== '') modalRef.current?.showModal();
   }, [mode]);
 
   if (!list) return <></>;
@@ -115,7 +89,7 @@ export const List = ({ list }: { list: ListData }) => {
           },
           {
             name: 'Delete List',
-            func: () => handleDeleteList(),
+            func: () => handleDelete(),
             icon: <IconTrash />,
           },
         ]}
@@ -128,7 +102,6 @@ export const List = ({ list }: { list: ListData }) => {
   const ListContent = () => (
     <div className='flex flex-col gap-y-2 overflow-y-scroll'>
       {list.cards &&
-        // list.cards.length > 0 &&
         list.cards.map((card) => <Card key={'c' + card.id} card={card} />)}
     </div>
   );
@@ -159,7 +132,7 @@ export const List = ({ list }: { list: ListData }) => {
             <Button
               variant={'outlined'}
               className='w-full'
-              onClick={() => handleAddCard()}
+              onClick={() => handleAdd()}
             >
               <IconCheck stroke={3} />
               <p>Add</p>
@@ -181,14 +154,10 @@ export const List = ({ list }: { list: ListData }) => {
             id='list'
           />
           <div className='flex gap-2'>
-            <Button variant={'outlined'} onClick={() => setMode('')}>
+            <Button variant={'secondary'} onClick={() => setMode('')}>
               <IconX stroke={3} />
             </Button>
-            <Button
-              variant={'outlined'}
-              className='w-full'
-              onClick={() => handleUpdateList()}
-            >
+            <Button className='w-full' onClick={() => handleEdit()}>
               <IconCheck stroke={3} />
               <p>Save</p>
             </Button>
@@ -197,6 +166,22 @@ export const List = ({ list }: { list: ListData }) => {
       );
   };
 
+  if (mode !== '') {
+    modalRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMode('');
+      if (inputRef.current?.value !== '' && e.key === 'Enter') {
+        mode == 'add' && handleAdd();
+        mode == 'edit' && handleEdit();
+      }
+    });
+    inputRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMode('');
+      if (inputRef.current?.value !== '' && e.key === 'Enter') {
+        mode == 'add' && handleAdd();
+        mode == 'edit' && handleEdit();
+      }
+    });
+  }
   return (
     <Container size={'sm'} snap={true}>
       <ListHeader />

@@ -43,17 +43,19 @@ export function Board() {
   const modalRef = useRef<HTMLDialogElement>(null);
   const router = useRouter();
 
-  function handleAddList() {
+  function handleAdd() {
     if (!inputRef.current?.value || !board?.id) return;
     const list: ListData = {
       title: inputRef.current.value,
       board_id: board.id as number,
+      position: board.lists ? board.lists.length + 1 : 0,
     };
     addList(list);
     inputRef.current.value = '';
+    setMode('');
   }
 
-  function handleUpdateTitle() {
+  function handleEdit() {
     if (!inputRef.current?.value || !board?.id) return;
     updateBoard({ ...board, title: inputRef.current.value });
     inputRef.current.value = '';
@@ -165,6 +167,10 @@ export function Board() {
               func: () => handleColorChange('emerald'),
               icon: <IconTree />,
             },
+            {
+              name: 'Remove Color',
+              func: () => handleColorChange(''),
+            },
           ]}
         >
           <IconPalette />
@@ -223,7 +229,7 @@ export function Board() {
             <Button
               variant={'outlined'}
               className='w-full'
-              onClick={() => handleAddList()}
+              onClick={() => handleAdd()}
             >
               <IconCheck stroke={3} />
               <p>Add</p>
@@ -234,6 +240,22 @@ export function Board() {
     </div>
   );
 
+  if (mode !== '') {
+    modalRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMode('');
+      if (inputRef.current?.value !== '' && e.key === 'Enter') {
+        mode == 'add' && handleAdd();
+        mode == 'edit' && handleEdit();
+      }
+    });
+    inputRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMode('');
+      if (inputRef.current?.value !== '' && e.key === 'Enter') {
+        mode == 'add' && handleAdd();
+        mode == 'edit' && handleEdit();
+      }
+    });
+  }
   return (
     <div
       className={cn(
@@ -294,13 +316,13 @@ export function Board() {
             id='board'
           />
           <div className='flex gap-2'>
-            <Button variant={'outlined'} onClick={() => setMode('')}>
+            <Button variant={'secondary'} onClick={() => setMode('')}>
               <IconX stroke={3} />
             </Button>
             <Button
-              variant={'outlined'}
+              variant={'default'}
               className='w-full'
-              onClick={() => handleUpdateTitle()}
+              onClick={() => handleEdit()}
             >
               <IconCheck stroke={3} />
               <p>Save</p>

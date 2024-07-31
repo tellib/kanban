@@ -47,10 +47,6 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
           className={`absolute right-0 z-50 mt-1.5 w-max origin-top-right divide-y divide-black/10 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 backdrop-blur-md transition-opacity duration-150 ease-in-out focus:outline-none dark:divide-white/10 dark:bg-neutral-900 ${
             open ? 'opacity-100' : 'pointer-events-none opacity-0'
           }`}
-          role='menu'
-          aria-orientation='vertical'
-          aria-labelledby='menu-button'
-          tabIndex={-1}
           onMouseLeave={() => setOpen(false)}
         >
           {options.map((option) => (

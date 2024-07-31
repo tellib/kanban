@@ -26,7 +26,6 @@ export function Navbar() {
       <>
         <Link key='Home' title='Home' href='/'>
           <Button
-            variant={'hover'}
             onClick={() => {
               router.push('/');
               setOpen(!open);
@@ -40,7 +39,6 @@ export function Navbar() {
           <>
             <Link key='Dashboard' title='Dashboard' href='/dashboard'>
               <Button
-                variant={'hover'}
                 onClick={() => {
                   router.push('/dashboard');
                   setOpen(!open);
@@ -52,7 +50,6 @@ export function Navbar() {
 
             <Link key='Sign out' title='Sign out' href='/signout'>
               <Button
-                variant={'hover'}
                 onClick={() => {
                   router.push('/signout');
                   setOpen(!open);
@@ -67,7 +64,6 @@ export function Navbar() {
         {!session && (
           <Link key='Login' title='Login' href='/login'>
             <Button
-              variant={'hover'}
               onClick={() => {
                 router.push('/login');
                 setOpen(!open);
@@ -100,7 +96,11 @@ export function Navbar() {
       </div>
       <MobileMenu ref={menuRef}>
         <div className='flex flex-col items-end gap-4 p-8'>
-          <Button className='w-max' onClick={() => setOpen(false)}>
+          <Button
+            // variant={'hover'}
+            className='w-max'
+            onClick={() => setOpen(false)}
+          >
             <IconMenu2 stroke={2} />
           </Button>
           <NavbarLinks />

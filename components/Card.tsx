@@ -56,7 +56,9 @@ export function Card({ card }: { card: CardData }) {
       onMouseEnter={() => setMode('hovered')}
       onMouseLeave={() => setMode('')}
     >
-      <p className='flex-1 self-center font-medium'>{card.title}</p>
+      <p className='flex-1 self-center hyphens-auto font-medium'>
+        {card.title}
+      </p>
       <IconPencil
         strokeWidth={2}
         className={cn(mode === 'hovered' ? 'opacity-50' : 'opacity-0')}

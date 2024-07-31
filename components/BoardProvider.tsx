@@ -37,16 +37,20 @@ export const BoardProvider = ({
   data: BoardData;
 }) => {
   const [board, setBoard] = useState<BoardData | null>(data);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ text: string | null; key: number }>({
+    text: null,
+    key: 0,
+  });
   const messageRef = useRef<HTMLDivElement>(null);
 
   const addBoard = (newBoard: BoardData) => {
     addBoardDB(newBoard).then((aBoard) => {
       if (aBoard) {
         setBoard(aBoard);
+        setMessage({ text: `Added board '${aBoard.title}'`, key: Date.now() });
         console.log('Added board', aBoard);
       } else {
-        setMessage('Unable to add board');
+        setMessage({ text: 'Unable to add board', key: Date.now() });
       }
     });
   };
@@ -59,9 +63,10 @@ export const BoardProvider = ({
           ...prev!,
           lists: [...(prev?.lists || []), aList],
         }));
+        setMessage({ text: `Added list '${aList.title}'`, key: Date.now() });
         console.log('Added list', aList);
       } else {
-        setMessage('Unable to add list');
+        setMessage({ text: 'Unable to add list', key: Date.now() });
       }
     });
   };
@@ -78,9 +83,10 @@ export const BoardProvider = ({
               : list
           ),
         }));
+        setMessage({ text: `Added card '${aCard.title}'`, key: Date.now() });
         console.log('Added card', aCard);
       } else {
-        setMessage('Unable to add card');
+        setMessage({ text: 'Unable to add card', key: Date.now() });
       }
     });
   };
@@ -89,9 +95,10 @@ export const BoardProvider = ({
     deleteBoardDB(id).then((dBoard) => {
       if (dBoard) {
         setBoard(null);
+        setMessage({ text: 'Deleted board', key: Date.now() });
         console.log('Deleted board', dBoard);
       } else {
-        setMessage('Unable to delete board');
+        setMessage({ text: 'Unable to delete board', key: Date.now() });
       }
     });
   };
@@ -104,10 +111,10 @@ export const BoardProvider = ({
           ...prev!,
           lists: prev?.lists?.filter((list) => list.id !== id),
         }));
-        setMessage('Deleted list');
+        setMessage({ text: 'Deleted list', key: Date.now() });
         console.log('Deleted list', dList);
       } else {
-        setMessage('Unable to delete list');
+        setMessage({ text: 'Unable to delete list', key: Date.now() });
       }
     });
   };
@@ -123,10 +130,10 @@ export const BoardProvider = ({
             cards: list.cards?.filter((card) => card.id !== id),
           })),
         }));
-        setMessage('Deleted card');
+        setMessage({ text: 'Deleted card', key: Date.now() });
         console.log('Deleted card', dCard);
       } else {
-        setMessage('Unable to delete card');
+        setMessage({ text: 'Unable to delete card', key: Date.now() });
       }
     });
   };
@@ -135,11 +142,11 @@ export const BoardProvider = ({
     if (!board?.id) return;
     updateBoardDB(updatedBoard).then((uBoard) => {
       if (uBoard) {
-        setMessage('Updated board');
+        setMessage({ text: 'Updated board', key: Date.now() });
         console.log('Updated board', uBoard);
         setBoard((board) => ({ ...board!, ...uBoard }));
       } else {
-        setMessage('Unable to update board');
+        setMessage({ text: 'Unable to update board', key: Date.now() });
       }
     });
   };
@@ -154,10 +161,10 @@ export const BoardProvider = ({
             list.id === uList.id ? { ...list, ...uList } : list
           ),
         }));
-        setMessage('Updated list');
+        setMessage({ text: 'Updated list', key: Date.now() });
         console.log('Updated list', uList);
       } else {
-        setMessage('Unable to update list');
+        setMessage({ text: 'Unable to update list', key: Date.now() });
       }
     });
   };
@@ -175,20 +182,19 @@ export const BoardProvider = ({
             ),
           })),
         }));
+        setMessage({ text: 'Updated card', key: Date.now() });
         console.log('Updated card', uCard);
       } else {
-        setMessage('Unable to update card');
+        setMessage({ text: 'Unable to update card', key: Date.now() });
       }
     });
   };
 
   useEffect(() => {
-    if (message) {
-      setTimeout(() => {
-        setMessage(null);
-      }, 3000);
+    if (message.text) {
+      setMessage((prev) => ({ ...prev, key: Date.now() }));
     }
-  }, [message]);
+  }, [message.text]);
 
   return (
     <BoardContext.Provider
@@ -209,9 +215,9 @@ export const BoardProvider = ({
       <>
         {children}
 
-        {message && (
-          <Message color='blue' ref={messageRef}>
-            <p>{message}</p>
+        {message.text && (
+          <Message title='Message' ref={messageRef} key={message.key}>
+            {message.text}
           </Message>
         )}
       </>
