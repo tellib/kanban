@@ -35,7 +35,7 @@ const textareaVariants = cva('', {
   variants: {
     variant: {
       default:
-        'resize-y min-h-36 w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/20  ring-1 ring-black/10 dark:ring-white/10 dark:ring-1 focus:ring-1 focus:ring-black/10 dark:focus:ring-white/10 focus:ring-offset-1 focus:ring-offset-black/10 dark:focus:ring-offset-white/10 mt-1',
+        'overflow-y-auto resize-none min-h-36 w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/20  ring-1 ring-black/10 dark:ring-white/10 dark:ring-1 focus:ring-1 focus:ring-black/10 dark:focus:ring-white/10 focus:ring-offset-1 focus:ring-offset-black/10 dark:focus:ring-offset-white/10 mt-1',
       unstyled: 'bg-transparent',
     },
   },

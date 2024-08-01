@@ -11,11 +11,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Container } from './Container';
-import { Modal } from './Modal';
+import { ContainerModal } from './ContainerModal';
 
 export function Dashboard() {
   const [boardList, setBoardList] = useState<BoardData[] | null>(null);
-  const [mode, setMode] = useState('');
+  const [mode, setMode] = useState<'' | 'add'>('');
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -105,7 +105,7 @@ export function Dashboard() {
       );
     if (mode === 'add')
       return (
-        <Modal title={'Add Board'} ref={modalRef}>
+        <ContainerModal size={'sm'} title={'Add Board'} ref={modalRef}>
           <Input
             type='text'
             ref={inputRef}
@@ -121,7 +121,7 @@ export function Dashboard() {
               <p>Add</p>
             </Button>
           </div>
-        </Modal>
+        </ContainerModal>
       );
   };
 

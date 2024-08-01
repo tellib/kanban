@@ -1,19 +1,27 @@
 'use client';
 
-import { IconPencil, IconTrash, IconX } from '@tabler/icons-react';
+import {
+  IconMenu2,
+  IconMenu3,
+  IconMenu4,
+  IconPencil,
+  IconTrash,
+  IconX,
+} from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { CardData } from '@/lib/data';
 import { Input } from './Input';
 import { Button } from './Button';
-import { Modal } from './Modal';
+import { ContainerModal } from './ContainerModal';
 import { TextArea } from './TextArea';
 import { useBoard } from '@/hooks/useBoard';
+import { Dropdown } from './Dropdown';
 
 export function Card({ card }: { card: CardData }) {
   const { deleteCard, updateCard } = useBoard();
-  const [mode, setMode] = useState('');
+  const [mode, setMode] = useState<'' | 'edit'>('');
 
   const modalRef = useRef<HTMLDialogElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
@@ -43,6 +51,12 @@ export function Card({ card }: { card: CardData }) {
           setMode('');
         }))
       : modalRef.current?.close();
+
+    if (modalRef.current?.open) {
+      modalRef.current.addEventListener('close', () => {
+        setMode('');
+      });
+    }
   }, [mode]);
 
   if (!card) return <></>;
@@ -53,15 +67,13 @@ export function Card({ card }: { card: CardData }) {
         'flex cursor-pointer flex-row items-start gap-2 rounded-md border-2 border-transparent bg-white py-2 pl-4 pr-2 shadow-inner transition duration-150 hover:border-blue-500 hover:ease-linear dark:bg-white/10'
       )}
       onClick={() => setMode('edit')}
-      onMouseEnter={() => setMode('hovered')}
-      onMouseLeave={() => setMode('')}
     >
       <p className='flex-1 self-center hyphens-auto font-medium'>
         {card.title}
       </p>
       <IconPencil
         strokeWidth={2}
-        className={cn(mode === 'hovered' ? 'opacity-50' : 'opacity-0')}
+        className='opacity-0 transition-opacity duration-300 hover:opacity-20'
       />
     </div>
   );
@@ -69,15 +81,16 @@ export function Card({ card }: { card: CardData }) {
   const CardModal = () => {
     if (mode)
       return (
-        <Modal size='lg' ref={modalRef}>
+        <ContainerModal size='lg' padding={'md'} gap={'md'} ref={modalRef}>
           <Input
             id='title'
+            label='Title'
             ref={titleRef}
             type='text'
             defaultValue={card?.title}
-            label='Title'
-            className='text-lg font-bold'
+            className='flex-grow text-lg font-bold'
           />
+
           <TextArea
             id='description'
             ref={descriptionRef}
@@ -85,13 +98,7 @@ export function Card({ card }: { card: CardData }) {
             label='Description'
             typeof='text'
           />
-          <div>
-            <Button onClick={() => handleDeleteCard()} className=''>
-              <IconTrash />
-              <p>Delete</p>
-            </Button>
-          </div>
-          <div className='flex gap-4'>
+          {/* <div className='flex gap-4'>
             <Input
               id='due'
               ref={dueRef}
@@ -106,7 +113,7 @@ export function Card({ card }: { card: CardData }) {
               defaultValue={card?.completed_at}
               label='Completed'
             />
-          </div>
+          </div> */}
           <div className='flex gap-4'>
             <Button
               variant={'secondary'}
@@ -118,8 +125,21 @@ export function Card({ card }: { card: CardData }) {
             <Button onClick={() => handleUpdateCard()} className='w-full'>
               Save
             </Button>
+            <Dropdown
+              variant={'secondary'}
+              title={'Actions'}
+              options={[
+                {
+                  name: 'Delete Card',
+                  func: handleDeleteCard,
+                  icon: <IconTrash />,
+                },
+              ]}
+            >
+              <IconMenu2 size={28} />
+            </Dropdown>
           </div>
-        </Modal>
+        </ContainerModal>
       );
   };
 

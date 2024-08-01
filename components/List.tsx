@@ -22,12 +22,12 @@ import { useSession } from '@/hooks/useSession';
 import { Dropdown } from './Dropdown';
 import { Container } from './Container';
 import { useBoard } from '@/hooks/useBoard';
-import { Modal } from './Modal';
+import { ContainerModal } from './ContainerModal';
 
 export const List = ({ list }: { list: ListData }) => {
   const { addCard, deleteList, deleteCard, updateList, updateCard } =
     useBoard();
-  const [mode, setMode] = useState('');
+  const [mode, setMode] = useState<'' | 'edit' | 'add' | 'delete'>('');
 
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDialogElement>(null);
@@ -68,20 +68,37 @@ export const List = ({ list }: { list: ListData }) => {
   useEffect(() => {
     if (mode === 'add') inputRef.current?.focus();
     if (mode !== '') modalRef.current?.showModal();
+
+    if (mode !== '') {
+      modalRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setMode('');
+        if (inputRef.current?.value !== '' && e.key === 'Enter') {
+          mode == 'add' && handleAdd();
+          mode == 'edit' && handleEdit();
+        }
+      });
+      inputRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setMode('');
+        if (inputRef.current?.value !== '' && e.key === 'Enter') {
+          mode == 'add' && handleAdd();
+          mode == 'edit' && handleEdit();
+        }
+      });
+    }
   }, [mode]);
 
   if (!list) return <></>;
 
   const ListHeader = () => (
-    <div className='flex items-center justify-between text-lg font-semibold dark:text-white'>
+    <div className='flex w-full items-center justify-between text-lg font-semibold dark:text-white'>
       <h1 className='truncate pl-2'>
-        {/* <span className='font-mono text-black/20 dark:text-white/20'>
-          {list.id}{' '}
-        </span> */}
         {list.title}
+        <span className='font-mono text-sm opacity-20'> ID: {list.id} </span>
       </h1>
       <Dropdown
-        title={'Actions'}
+        className=''
+        title='Other'
+        variant={'hover'}
         options={[
           {
             name: 'Edit List Name',
@@ -147,7 +164,7 @@ export const List = ({ list }: { list: ListData }) => {
   const ListModal = () => {
     if (mode === 'edit')
       return (
-        <Modal size='sm' title={'Edit List'} ref={modalRef}>
+        <ContainerModal size='sm' title={'Edit List'} ref={modalRef}>
           <Input
             type='text'
             ref={inputRef}
@@ -163,12 +180,12 @@ export const List = ({ list }: { list: ListData }) => {
               <p>Save</p>
             </Button>
           </div>
-        </Modal>
+        </ContainerModal>
       );
 
     if (mode === 'delete')
       return (
-        <Modal size='sm' title={'Delete List'} ref={modalRef}>
+        <ContainerModal size='sm' title={'Delete List'} ref={modalRef}>
           <p>Are you sure you want to delete this list?</p>
           <div className='flex gap-4'>
             <Button
@@ -184,28 +201,12 @@ export const List = ({ list }: { list: ListData }) => {
               <p>Delete</p>
             </Button>
           </div>
-        </Modal>
+        </ContainerModal>
       );
   };
 
-  if (mode !== '') {
-    modalRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMode('');
-      if (inputRef.current?.value !== '' && e.key === 'Enter') {
-        mode == 'add' && handleAdd();
-        mode == 'edit' && handleEdit();
-      }
-    });
-    inputRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMode('');
-      if (inputRef.current?.value !== '' && e.key === 'Enter') {
-        mode == 'add' && handleAdd();
-        mode == 'edit' && handleEdit();
-      }
-    });
-  }
   return (
-    <Container size={'sm'} snap={true}>
+    <Container size={'sm'} transparency={70} snap={true}>
       <ListHeader />
       <ListContent />
       <ListButtons />

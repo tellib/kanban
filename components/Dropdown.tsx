@@ -1,5 +1,6 @@
 import { forwardRef, useState } from 'react';
-import { Button } from './Button';
+import { Button, buttonVariants } from './Button';
+import { VariantProps } from 'class-variance-authority';
 
 export interface Option {
   name: string;
@@ -20,20 +21,22 @@ export function Option({ name, func, icon }: Option) {
   );
 }
 
-export interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface DropdownProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof buttonVariants> {
   title: string;
   options: Option[];
 }
 
 export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
-  ({ children, className, options, ...props }, ref) => {
+  ({ children, className, options, variant, ...props }, ref) => {
     const [open, setOpen] = useState(false);
 
     return (
       <div className='relative inline-block text-left'>
         <div>
           <Button
-            variant={'hover'}
+            variant={variant}
             onClick={() => {
               setOpen(!open);
             }}

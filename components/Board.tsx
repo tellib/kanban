@@ -30,7 +30,7 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 import { Dropdown } from './Dropdown';
 import { cn } from '@/lib/utils';
 import { Navcol } from './Navcol';
-import { Modal } from './Modal';
+import { ContainerModal } from './ContainerModal';
 import { useBoard } from '@/hooks/useBoard';
 import { ListData, BoardData } from '@/lib/data';
 
@@ -121,6 +121,7 @@ export function Board() {
         </Button>
 
         <Dropdown
+          variant={'hover'}
           title={'Colors'}
           options={[
             {
@@ -178,6 +179,7 @@ export function Board() {
           <p className='hidden md:inline'>Colors</p>
         </Dropdown>
         <Dropdown
+          variant={'hover'}
           title={'More'}
           options={[
             {
@@ -268,7 +270,7 @@ export function Board() {
       <BoardContent />
 
       {mode === 'delete' && (
-        <Modal title={'Delete Board'} ref={modalRef}>
+        <ContainerModal title={'Delete Board'} ref={modalRef}>
           <p>Are you sure you want to delete this board?</p>
           <div className='flex gap-4'>
             <Button
@@ -284,11 +286,11 @@ export function Board() {
               <p>Delete</p>
             </Button>
           </div>
-        </Modal>
+        </ContainerModal>
       )}
 
       {mode === 'info' && (
-        <Modal size='sm' title={'Board Info'} ref={modalRef}>
+        <ContainerModal size='sm' title={'Board Info'} ref={modalRef}>
           <p>
             <span className='font-bold'>Board Name: </span>
             {board?.title}
@@ -305,11 +307,11 @@ export function Board() {
             <IconX />
             <p>Close</p>
           </Button>
-        </Modal>
+        </ContainerModal>
       )}
 
       {mode === 'edit' && (
-        <Modal size='sm' title={'Edit Board'} ref={modalRef}>
+        <ContainerModal size='sm' title={'Edit Board'} ref={modalRef}>
           <Input
             type='text'
             ref={inputRef}
@@ -329,11 +331,11 @@ export function Board() {
               <p>Save</p>
             </Button>
           </div>
-        </Modal>
+        </ContainerModal>
       )}
 
       {mode === 'delete' && (
-        <Modal size='sm' title={'Delete Board'} ref={modalRef}>
+        <ContainerModal size='sm' title={'Delete Board'} ref={modalRef}>
           <p>Are you sure you want to delete this board?</p>
           <div className='flex gap-4'>
             <Button
@@ -349,7 +351,7 @@ export function Board() {
               <p>Delete</p>
             </Button>
           </div>
-        </Modal>
+        </ContainerModal>
       )}
     </div>
   );

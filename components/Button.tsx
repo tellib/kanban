@@ -21,7 +21,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = 'Button';
 
 // TODO add variants, fix styles
-const buttonVariants = cva('font-medium', {
+export const buttonVariants = cva('font-medium', {
   variants: {
     variant: {
       default:
