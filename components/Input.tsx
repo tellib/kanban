@@ -12,9 +12,9 @@ export interface InputProps
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, className, variant, id, ...props }, ref) => {
     return (
-      <div className='flex flex-col'>
+      <div className='flex w-full flex-col'>
         {label && (
-          <label htmlFor={id} className='text-sm font-medium'>
+          <label htmlFor={id} className='w-full font-medium'>
             {label}
           </label>
         )}
@@ -31,12 +31,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = 'Input';
 
 // TODO add variants
-const inputVariants = cva('w-full', {
+const inputVariants = cva('min-w-full', {
   variants: {
     variant: {
       default:
         'rounded-md px-3 py-2 text-sm bg-white dark:bg-white/20  ring-1 ring-black/10 dark:ring-white/10 dark:ring-1 focus:ring-1 focus:ring-black/10 dark:focus:ring-white/10 focus:ring-offset-1 focus:ring-offset-black/10 dark:focus:ring-offset-white/10 mt-1',
-      unstyled: 'bg-transparent',
+      unstyled: 'bg-transparent focus:bg-white p-1',
     },
   },
   defaultVariants: {

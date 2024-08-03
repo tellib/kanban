@@ -215,11 +215,11 @@ export const BoardProvider = ({
       <>
         {children}
 
-        {message.text && (
+        {/* {message.text && (
           <Message title='Message' ref={messageRef} key={message.key}>
             {message.text}
           </Message>
-        )}
+        )} */}
       </>
     </BoardContext.Provider>
   );

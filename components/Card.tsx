@@ -1,19 +1,19 @@
 'use client';
 
 import {
+  IconBook,
+  IconCalendar,
+  IconCheckbox,
+  IconList,
   IconMenu2,
-  IconMenu3,
-  IconMenu4,
   IconPencil,
   IconTrash,
-  IconX,
 } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { CardData } from '@/lib/data';
 import { Input } from './Input';
-import { Button } from './Button';
 import { ContainerModal } from './ContainerModal';
 import { TextArea } from './TextArea';
 import { useBoard } from '@/hooks/useBoard';
@@ -45,15 +45,11 @@ export function Card({ card }: { card: CardData }) {
   };
 
   useEffect(() => {
-    mode === 'edit'
-      ? (modalRef.current?.showModal(),
-        modalRef.current?.addEventListener('close', () => {
-          setMode('');
-        }))
-      : modalRef.current?.close();
+    mode === 'edit' ? modalRef.current?.showModal() : modalRef.current?.close();
 
     if (modalRef.current?.open) {
       modalRef.current.addEventListener('close', () => {
+        handleUpdateCard();
         setMode('');
       });
     }
@@ -81,50 +77,49 @@ export function Card({ card }: { card: CardData }) {
   const CardModal = () => {
     if (mode)
       return (
-        <ContainerModal size='lg' padding={'md'} gap={'md'} ref={modalRef}>
-          <Input
-            id='title'
-            label='Title'
-            ref={titleRef}
-            type='text'
-            defaultValue={card?.title}
-            className='flex-grow text-lg font-bold'
-          />
-
-          <TextArea
-            id='description'
-            ref={descriptionRef}
-            defaultValue={card?.description}
-            label='Description'
-            typeof='text'
-          />
-          {/* <div className='flex gap-4'>
+        <ContainerModal size='lg' padding={'lg'} gap={'md'} ref={modalRef}>
+          <div className='flex items-center gap-4'>
+            <IconBook size={24} />
             <Input
-              id='due'
-              ref={dueRef}
-              type='date'
-              defaultValue={card?.due_on}
-              label='Due Date'
+              id='title'
+              ref={titleRef}
+              type='text'
+              defaultValue={card?.title}
+              className='text-xl font-bold'
+              variant={'unstyled'}
             />
-            <Input
-              id='completed'
-              ref={completedRef}
-              type='date'
-              defaultValue={card?.completed_at}
-              label='Completed'
-            />
-          </div> */}
+          </div>
           <div className='flex gap-4'>
-            <Button
-              variant={'secondary'}
-              onClick={() => setMode('')}
-              className='w-full'
-            >
-              Cancel
-            </Button>
-            <Button onClick={() => handleUpdateCard()} className='w-full'>
-              Save
-            </Button>
+            <IconList size={24} />
+            <TextArea
+              id='description'
+              ref={descriptionRef}
+              defaultValue={card?.description}
+              label='Description'
+              typeof='text'
+              placeholder='Add a description...'
+            />
+          </div>
+          <div className='flex gap-4'>
+            <IconCalendar size={24} />
+            <div className='flex flex-grow gap-8'>
+              <Input
+                id='due'
+                ref={dueRef}
+                type='date'
+                defaultValue={card?.due_on}
+                label='Due Date'
+              />
+              <Input
+                id='completed'
+                ref={completedRef}
+                type='date'
+                defaultValue={card?.completed_at}
+                label='Completed'
+              />
+            </div>
+          </div>
+          {/* <div className='flex gap-4'>
             <Dropdown
               variant={'secondary'}
               title={'Actions'}
@@ -138,7 +133,22 @@ export function Card({ card }: { card: CardData }) {
             >
               <IconMenu2 size={28} />
             </Dropdown>
-          </div>
+          </div> */}
+          {/* <div className='flex gap-4'>
+            <IconCheckbox size={24} />
+            <div className='flex flex-col gap-2'>
+              <h3 className='font-medium'>Checklist</h3>
+              <div className='flex items-center gap-2'>
+                <input
+                  id='accent'
+                  type='checkbox'
+                  className='h-5 w-5 accent-blue-500'
+                  checked
+                />
+                <label htmlFor='accent'> Customzied </label>
+              </div>
+            </div>
+          </div> */}
         </ContainerModal>
       );
   };

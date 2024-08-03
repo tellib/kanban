@@ -30,7 +30,7 @@ export const Message = forwardRef<HTMLDivElement, DialogProps>(
         ref={ref}
         className={cn(
           className,
-          'fixed bottom-6 right-6 z-40 flex w-48 min-w-48 items-center gap-2 rounded-xl bg-white p-4 shadow-lg transition-opacity duration-200 dark:bg-neutral-800',
+          'fixed bottom-6 right-6 z-30 flex w-60 max-w-60 items-center gap-2 rounded-xl bg-white/80 p-4 shadow-lg transition-opacity duration-200 dark:bg-black/80',
           isOpen ? 'opacity-100' : 'opacity-0'
         )}
         {...props}

@@ -70,13 +70,10 @@ export const List = ({ list }: { list: ListData }) => {
     if (mode !== '') modalRef.current?.showModal();
 
     if (mode !== '') {
-      modalRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Escape') setMode('');
-        if (inputRef.current?.value !== '' && e.key === 'Enter') {
-          mode == 'add' && handleAdd();
-          mode == 'edit' && handleEdit();
-        }
+      modalRef.current?.addEventListener('close', () => {
+        setMode('');
       });
+
       inputRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'Escape') setMode('');
         if (inputRef.current?.value !== '' && e.key === 'Enter') {
@@ -85,7 +82,7 @@ export const List = ({ list }: { list: ListData }) => {
         }
       });
     }
-  }, [mode]);
+  });
 
   if (!list) return <></>;
 

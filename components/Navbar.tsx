@@ -104,9 +104,9 @@ export function Navbar() {
         </Button>
       </div>
       <MobileMenu ref={menuRef}>
-        <div className='flex flex-col items-end gap-4 p-8'>
+        <div className='flex flex-col items-end gap-4 p-3'>
           <Button
-            // variant={'hover'}
+            variant={'hover'}
             className='w-max'
             onClick={() => setOpen(false)}
           >
