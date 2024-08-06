@@ -25,6 +25,12 @@ interface BoardContextType {
   updateBoard: (updatedBoard: BoardData) => void;
   updateList: (updatedList: ListData) => void;
   updateCard: (updatedCard: CardData) => void;
+  updateCardPosition: (
+    sourceIndex: number,
+    destinationIndex: number,
+    sourceListId: number,
+    destinationListId: number
+  ) => void;
 }
 
 export const BoardContext = createContext<BoardContextType | null>(null);
@@ -48,7 +54,6 @@ export const BoardProvider = ({
       if (aBoard) {
         setBoard(aBoard);
         setMessage({ text: `Added board '${aBoard.title}'`, key: Date.now() });
-        console.log('Added board', aBoard);
       } else {
         setMessage({ text: 'Unable to add board', key: Date.now() });
       }
@@ -64,7 +69,6 @@ export const BoardProvider = ({
           lists: [...(prev?.lists || []), aList],
         }));
         setMessage({ text: `Added list '${aList.title}'`, key: Date.now() });
-        console.log('Added list', aList);
       } else {
         setMessage({ text: 'Unable to add list', key: Date.now() });
       }
@@ -84,7 +88,6 @@ export const BoardProvider = ({
           ),
         }));
         setMessage({ text: `Added card '${aCard.title}'`, key: Date.now() });
-        console.log('Added card', aCard);
       } else {
         setMessage({ text: 'Unable to add card', key: Date.now() });
       }
@@ -96,7 +99,6 @@ export const BoardProvider = ({
       if (dBoard) {
         setBoard(null);
         setMessage({ text: 'Deleted board', key: Date.now() });
-        console.log('Deleted board', dBoard);
       } else {
         setMessage({ text: 'Unable to delete board', key: Date.now() });
       }
@@ -112,7 +114,6 @@ export const BoardProvider = ({
           lists: prev?.lists?.filter((list) => list.id !== id),
         }));
         setMessage({ text: 'Deleted list', key: Date.now() });
-        console.log('Deleted list', dList);
       } else {
         setMessage({ text: 'Unable to delete list', key: Date.now() });
       }
@@ -127,11 +128,10 @@ export const BoardProvider = ({
           ...prev!,
           lists: prev?.lists?.map((list) => ({
             ...list,
-            cards: list.cards?.filter((card) => card.id !== id),
+            cards: list.cards?.filter((card) => card.id !== id) || [],
           })),
         }));
         setMessage({ text: 'Deleted card', key: Date.now() });
-        console.log('Deleted card', dCard);
       } else {
         setMessage({ text: 'Unable to delete card', key: Date.now() });
       }
@@ -143,7 +143,6 @@ export const BoardProvider = ({
     updateBoardDB(updatedBoard).then((uBoard) => {
       if (uBoard) {
         setMessage({ text: 'Updated board', key: Date.now() });
-        console.log('Updated board', uBoard);
         setBoard((board) => ({ ...board!, ...uBoard }));
       } else {
         setMessage({ text: 'Unable to update board', key: Date.now() });
@@ -162,7 +161,6 @@ export const BoardProvider = ({
           ),
         }));
         setMessage({ text: 'Updated list', key: Date.now() });
-        console.log('Updated list', uList);
       } else {
         setMessage({ text: 'Unable to update list', key: Date.now() });
       }
@@ -177,17 +175,95 @@ export const BoardProvider = ({
           ...prev!,
           lists: prev?.lists?.map((list) => ({
             ...list,
-            cards: list.cards?.map((card) =>
-              card.id === uCard.id ? uCard : card
-            ),
+            cards:
+              list.cards?.map((card) =>
+                card.id === uCard.id ? uCard : card
+              ) || [],
           })),
         }));
         setMessage({ text: 'Updated card', key: Date.now() });
-        console.log('Updated card', uCard);
       } else {
         setMessage({ text: 'Unable to update card', key: Date.now() });
       }
     });
+  };
+
+  // used for drag and drop
+  const updateCardPosition = async (
+    sourceIndex: number,
+    destinationIndex: number,
+    sourceListId: number,
+    destinationListId: number
+  ) => {
+    if (!board) return;
+
+    const updatedLists = board.lists?.map((list) => {
+      if (list.id === sourceListId) {
+        const sourceCards = list.cards || [];
+        const [movedCard] = sourceCards.splice(sourceIndex, 1);
+
+        if (sourceListId === destinationListId) {
+          sourceCards.splice(destinationIndex, 0, movedCard);
+          return { ...list, cards: sourceCards };
+        }
+
+        return { ...list, cards: sourceCards };
+      }
+
+      if (list.id === destinationListId) {
+        const destinationCards = list.cards || [];
+        const movedCard = board.lists?.find((lst) => lst.id === sourceListId)
+          ?.cards?.[sourceIndex];
+
+        if (movedCard) {
+          destinationCards.splice(destinationIndex, 0, movedCard);
+        }
+
+        return { ...list, cards: destinationCards };
+      }
+
+      return list;
+    });
+
+    if (updatedLists) {
+      setBoard((prev) => ({
+        ...prev!,
+        lists: updatedLists,
+      }));
+
+      const sourceList = updatedLists.find((list) => list.id === sourceListId);
+      const destinationList = updatedLists.find(
+        (list) => list.id === destinationListId
+      );
+
+      if (sourceList && destinationList) {
+        const updateSource = sourceList.cards?.map((card, index) => ({
+          title: card.title,
+          id: card.id,
+          position: index,
+          list_id: sourceListId,
+        }));
+
+        const updateDestination = destinationList.cards?.map((card, index) => ({
+          title: card.title,
+          id: card.id,
+          position: index,
+          list_id: destinationListId,
+        }));
+
+        const updates = [...(updateSource || []), ...(updateDestination || [])];
+
+        // Update each card's position and list_id in the database
+        for (const update of updates) {
+          await updateCard({
+            title: update.title,
+            id: update.id,
+            position: update.position,
+            list_id: update.list_id,
+          });
+        }
+      }
+    }
   };
 
   useEffect(() => {
@@ -210,6 +286,7 @@ export const BoardProvider = ({
         updateBoard,
         updateList,
         updateCard,
+        updateCardPosition,
       }}
     >
       <>

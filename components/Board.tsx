@@ -29,19 +29,38 @@ import { Input } from './Input';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { Dropdown } from './Dropdown';
 import { cn } from '@/lib/utils';
-import { Navcol } from './Navcol';
 import { ContainerModal } from './ContainerModal';
 import { useBoard } from '@/hooks/useBoard';
 import { ListData, BoardData } from '@/lib/data';
+import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 
 export function Board() {
-  const { board, addList, deleteBoard, deleteList, updateBoard, updateList } =
+  const { board, addList, deleteBoard, updateBoard, updateCardPosition } =
     useBoard();
 
   const [mode, setMode] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDialogElement>(null);
   const router = useRouter();
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const { source, destination } = result;
+
+    if (
+      source.index === destination.index &&
+      source.droppableId === destination.droppableId
+    )
+      return;
+
+    updateCardPosition(
+      source.index,
+      destination.index,
+      parseInt(source.droppableId),
+      parseInt(destination.droppableId)
+    );
+  };
 
   function handleAdd() {
     if (!inputRef.current?.value || !board?.id) return;
@@ -213,34 +232,45 @@ export function Board() {
   );
 
   const BoardContent = () => (
-    <div className='flex flex-1 snap-x snap-mandatory gap-4 overflow-y-auto p-4 sm:snap-none dark:[color-scheme:dark]'>
-      {board?.lists &&
-        board.lists.length > 0 &&
-        board.lists.map((list) => <List key={'l' + list.id} list={list} />)}
-      {mode === 'add' && (
-        <div className='flex h-max max-h-full min-w-full snap-center snap-always flex-col gap-2 rounded-lg bg-white/70 p-2 shadow-xl ring-1 ring-inset ring-white/70 backdrop-blur sm:w-72 sm:min-w-72 dark:bg-black/70 dark:ring-black/70'>
-          <Input
-            type='text'
-            ref={inputRef}
-            placeholder='List title'
-            id='list'
-          />
-          <div className='flex gap-2'>
-            <Button variant={'outlined'} onClick={() => setMode('')}>
-              <IconX stroke={3} />
-            </Button>
-            <Button
-              variant={'outlined'}
-              className='w-full'
-              onClick={() => handleAdd()}
-            >
-              <IconCheck stroke={3} />
-              <p>Add</p>
-            </Button>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <div className='flex flex-1 snap-x snap-mandatory gap-4 overflow-y-auto p-4 sm:snap-none dark:[color-scheme:dark]'>
+        {board?.lists &&
+          board.lists.length > 0 &&
+          board.lists.map((list) => (
+            <Droppable droppableId={list.id!.toString()} key={list.id}>
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  <List list={list} />
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          ))}
+        {mode === 'add' && (
+          <div className='flex h-max max-h-full min-w-full snap-center snap-always flex-col gap-2 rounded-lg bg-white/70 p-2 shadow-xl ring-1 ring-inset ring-white/70 backdrop-blur sm:w-72 sm:min-w-72 dark:bg-black/70 dark:ring-black/70'>
+            <Input
+              type='text'
+              ref={inputRef}
+              placeholder='List title'
+              id='list'
+            />
+            <div className='flex gap-2'>
+              <Button variant={'outlined'} onClick={() => setMode('')}>
+                <IconX stroke={3} />
+              </Button>
+              <Button
+                variant={'outlined'}
+                className='w-full'
+                onClick={() => handleAdd()}
+              >
+                <IconCheck stroke={3} />
+                <p>Add</p>
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </DragDropContext>
   );
 
   if (mode !== '') {

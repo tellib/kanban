@@ -8,6 +8,7 @@ import {
   IconMenu2,
   IconPencil,
   IconTrash,
+  IconX,
 } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -38,8 +39,12 @@ export function Card({ card }: { card: CardData }) {
       ...card,
       title: titleRef.current?.value || '',
       description: descriptionRef.current?.value || '',
-      // due_on: dueRef.current?.value || '',
-      // completed_at: completedRef.current?.value || '',
+      // due_on: dueRef.current?.value
+      //   ? new Date(dueRef.current?.value).toISOString()
+      //   : undefined,
+      // completed_at: completedRef.current?.value
+      //   ? new Date(completedRef.current?.value).toISOString()
+      //   : undefined,
     };
     updateCard(updatedCard);
   };
@@ -52,6 +57,12 @@ export function Card({ card }: { card: CardData }) {
         handleUpdateCard();
         setMode('');
       });
+      modalRef.current?.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+          handleUpdateCard();
+          setMode('');
+        }
+      });
     }
   }, [mode]);
 
@@ -60,11 +71,11 @@ export function Card({ card }: { card: CardData }) {
   const CardContent = () => (
     <div
       className={cn(
-        'flex cursor-pointer flex-row items-start gap-2 rounded-md border-2 border-transparent bg-white py-2 pl-4 pr-2 shadow-inner transition duration-150 hover:border-blue-500 hover:ease-linear dark:bg-white/10'
+        'flex cursor-pointer flex-row items-start gap-2 rounded-md border-2 border-transparent bg-white py-2 pl-4 pr-2 shadow-sm transition duration-150 hover:border-blue-500 hover:ease-linear dark:bg-white/10'
       )}
       onClick={() => setMode('edit')}
     >
-      <p className='flex-1 self-center hyphens-auto font-medium'>
+      <p className='relative flex-1 self-center hyphens-auto font-medium'>
         {card.title}
       </p>
       <IconPencil
@@ -88,6 +99,11 @@ export function Card({ card }: { card: CardData }) {
               className='text-xl font-bold'
               variant={'unstyled'}
             />
+            <IconX
+              strokeWidth={2}
+              className='cursor-pointer'
+              onClick={() => setMode('')}
+            />
           </div>
           <div className='flex gap-4'>
             <IconList size={24} />
@@ -100,7 +116,7 @@ export function Card({ card }: { card: CardData }) {
               placeholder='Add a description...'
             />
           </div>
-          <div className='flex gap-4'>
+          {/* <div className='flex gap-4'>
             <IconCalendar size={24} />
             <div className='flex flex-grow gap-8'>
               <Input
@@ -118,7 +134,7 @@ export function Card({ card }: { card: CardData }) {
                 label='Completed'
               />
             </div>
-          </div>
+          </div> */}
           {/* <div className='flex gap-4'>
             <Dropdown
               variant={'secondary'}

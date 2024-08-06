@@ -23,10 +23,10 @@ import { Dropdown } from './Dropdown';
 import { Container } from './Container';
 import { useBoard } from '@/hooks/useBoard';
 import { ContainerModal } from './ContainerModal';
+import { Draggable } from '@hello-pangea/dnd';
 
 export const List = ({ list }: { list: ListData }) => {
-  const { addCard, deleteList, deleteCard, updateList, updateCard } =
-    useBoard();
+  const { addCard, deleteList, updateList } = useBoard();
   const [mode, setMode] = useState<'' | 'edit' | 'add' | 'delete'>('');
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -115,9 +115,34 @@ export const List = ({ list }: { list: ListData }) => {
   );
 
   const ListContent = () => (
-    <div className='flex flex-col gap-y-2 overflow-y-scroll'>
+    <div className='space-y-2 overflow-y-scroll'>
       {list.cards &&
-        list.cards.map((card) => <Card key={'c' + card.id} card={card} />)}
+        list.cards.map((card, index) => (
+          // need to make cards not be underneath the list
+          <Draggable
+            draggableId={card.id!.toString()}
+            index={index}
+            key={card.id}
+          >
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                className='relative transform-none'
+                // need to add styles otherwise the card is not under the cursor
+                style={{
+                  ...provided.draggableProps.style,
+                  left: 'auto !important',
+                  top: 'auto !important',
+                }}
+                // draggable could be implemented a bit better, kind of glitchy now
+              >
+                <Card card={card} />
+              </div>
+            )}
+          </Draggable>
+        ))}
     </div>
   );
 
