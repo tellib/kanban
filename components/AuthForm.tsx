@@ -27,27 +27,29 @@ export function AuthForm() {
     const confirmPassword = confirmPasswordRef.current?.value as string;
 
     const valid = validate(email, password, confirmPassword);
-    if (!valid) {
+    if (valid !== true) {
       setError(valid);
       setLoading(false);
       return;
     }
 
-    try {
-      if (registering) {
-        await signUp(email, password).then((session) => {
-          if (!session) setError('Error registering');
-        });
-      } else {
-        await signInWithPassword(email, password).then((session) => {
-          if (!session) setError('Invalid email or password');
-        });
+    if (valid === true) {
+      try {
+        if (registering) {
+          await signUp(email, password).then((session) => {
+            if (!session) setError('Error registering');
+          });
+        } else {
+          await signInWithPassword(email, password).then((session) => {
+            if (!session) setError('Invalid email or password');
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        setError('There was an error');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.log(error);
-      setError('There was an error');
-    } finally {
-      setLoading(false);
     }
   };
 
